@@ -16,6 +16,10 @@
 
 namespace local_sqlquerybuilder;
 
+use stdClass;
+use local_sqlquerybuilder\select;
+use local_sqlquerybuilder\where;
+
 /**
  * A Query builder
  *
@@ -25,6 +29,8 @@ namespace local_sqlquerybuilder;
  */
 
 class query {
+    use select, where;
+
     /**
      * @param string $from table which concerns the query
      */
@@ -36,9 +42,24 @@ class query {
      * @return string the SQL query
      */
     public function to_sql(): string {
-        $sql = 'SELECT ' . $this->export_select()
-            . 'FROM {' . $from . '}';
+        $sql = $this->export_select()
+            . 'FROM {' . $this->from . '}'
+            . $this->export_where();
 
         return $sql;
+    }
+
+    public function get(): array {
+        global $DB;
+        return $DB->get_records_sql($this->to_sql());
+    }
+
+    public function first(): stdClass {
+        $res = new stdClass();
+        return $res;
+    }
+
+    public function find(int $id): stdClass|bool {
+        return false;
     }
 }
