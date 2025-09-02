@@ -43,10 +43,10 @@ class query {
      */
     public function to_sql(): string {
         $sql = $this->export_select()
-            . 'FROM {' . $this->from . '}'
+            . ' FROM {' . $this->from . '}'
             . $this->export_where();
 
-        return $sql;
+        return trim($sql);
     }
 
     public function get(): array {
