@@ -45,6 +45,7 @@ class query {
     public function to_sql(): string {
         $sql = $this->export_select()
             . ' FROM {' . $this->from . '}'
+            . $this->export_join()
             . $this->export_where();
 
         return trim($sql);

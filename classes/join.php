@@ -18,7 +18,7 @@ namespace local_sqlquerybuilder;
 
 
 use local_sqlquerybuilder\joins\join_expression;
-use local_sqlquerybuilder\joins\join_type;
+use local_sqlquerybuilder\joins\join_types;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -35,20 +35,20 @@ trait join {
 
     }
     public function join($table, $first, $operator, $second , $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::INNER, $alias];
+        $this->joins[] = [$table, $first, $operator, $second, join_types::INNER, $alias];
     }
 
     public function leftjoin($table, $first, $operator, $second, $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::LEFT, $alias];
+        $this->joins[] = [$table, $first, $operator, $second, join_types::LEFT, $alias];
     }
     public function rightjoin($table, $first, $operator, $second, $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::RIGHT, $alias];
+        $this->joins[] = [$table, $first, $operator, $second, join_types::RIGHT, $alias];
     }
     public function fulljoin($table, $first, $operator, $second, $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::FULL, $alias];
+        $this->joins[] = [$table, $first, $operator, $second, join_types::FULL, $alias];
     }
 /*     public function crossjoin($table, $first, $operator, $second, $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::CROSS, $alias];
+        $this->joins[] = [$table, $first, $operator, $second, join_types::CROSS, $alias];
     } */
     protected function export_join(): string {
         if (empty($this->joins)){

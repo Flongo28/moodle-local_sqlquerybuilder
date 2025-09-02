@@ -22,8 +22,8 @@ namespace local_sqlquerybuilder\joins;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum join_type: string {
-    case INNER = "INNER";
+enum join_types: string {
+    case INNER = "";
     case LEFT = "LEFT";
     case FULL = "FULL";
     case RIGHT = "RIGHT";
