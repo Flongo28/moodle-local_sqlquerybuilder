@@ -31,12 +31,11 @@ class column_aggregate extends column {
      *
      * @param aggregation $type Aggregation type to use
      * @param string $name Name of the column
-     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      */
-    public function __construct(aggregation $type, string $name, ?string $table = null, ?string $alias = null) {
+    public function __construct(aggregation $type, string $name, ?string $alias = null) {
         $this->type = $type;
-        parent::__construct($name, $table, $alias);
+        parent::__construct($name, $alias);
     }
 
     /**
@@ -45,8 +44,7 @@ class column_aggregate extends column {
      * @return string column for select as sql
      */
     public function export(): string {
-        $locator = $this->get_column_locator();
-        $column = $this->type->value . "($locator)";
+        $column = $this->type->value . "($this->name)";
 
         if ($this->alias !== null) {
             $column .= " AS $this->alias";

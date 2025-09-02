@@ -52,12 +52,11 @@ trait select {
      * Selects an array of columns
      *
      * @param string $name Name of the column
-     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      * @return $this Instance of the Builder
      */
-    public function select(string $name, ?string $table = null, ?string $alias = null): static {
-        $this->select[] = new column($name, $table, $alias);
+    public function select(string $name, ?string $alias = null): static {
+        $this->select[] = new column($name, $alias);
         return $this;
     }
 
@@ -79,12 +78,11 @@ trait select {
      * Should not be used with other selects
      *
      * @param string $name Name of the column
-     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      * @return $this Instance of the Builder
      */
-    public function select_max(string $name, ?string $table = null, ?string $alias = null): static {
-        $this->select[] = new column_aggregate(aggregation::MAX, $name, $table, $alias);
+    public function select_max(string $name, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::MAX, $name, $alias);
         return $this;
     }
 
@@ -94,12 +92,11 @@ trait select {
      * Should not be used with other selects
      *
      * @param string $name Name of the column
-     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      * @return $this Instance of the Builder
      */
-    public function select_min(string $name, ?string $table = null, ?string $alias = null): static {
-        $this->select[] = new column_aggregate(aggregation::MIN, $name, $table, $alias);
+    public function select_min(string $name, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::MIN, $name, $alias);
         return $this;
     }
 
@@ -109,12 +106,11 @@ trait select {
      * Should not be used with other selects
      *
      * @param string $name Name of the column
-     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      * @return $this Instance of the Builder
      */
-    public function select_sum(string $name, ?string $table = null, ?string $alias = null): static {
-        $this->select[] = new column_aggregate(aggregation::SUM, $name, $table, $alias);
+    public function select_sum(string $name, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::SUM, $name, $alias);
         return $this;
     }
 
