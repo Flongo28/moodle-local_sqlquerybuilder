@@ -54,12 +54,30 @@ class query {
         return $DB->get_records_sql($this->to_sql());
     }
 
-    public function first(): stdClass {
-        $res = new stdClass();
-        return $res;
+    public function first(): ?\stdClass {
+        global $DB;
+
+        if (empty($this->wheres)) {
+            $record = $DB->get_record($this->from, [], '*', IGNORE_MULTIPLE);
+        } else {
+            // Only supports simple '=' and '<>' for now.
+            [$field, $operator, $value] = $this->wheres[0];
+            if ($operator === '=') {
+                $record = $DB->get_record($this->from, [$field => $value], '*', IGNORE_MULTIPLE);
+            } else if ($operator === '<>') {
+                $records = $DB->get_records_select($this->from, "{$field} <> :val", ['val' => $value], 'id ASC', '*', 0, 1);
+                $record = reset($records) ?: false;
+            } else {
+                throw new \coding_exception("Operator $operator not supported in first()");
+            }
+        }
+
+        return $record === false ? null : $record;
     }
 
     public function find(int $id): stdClass|bool {
-        return false;
+        global $DB;
+        return $DB->get_record($this->from, ['id' => $id]);
     }
+
 }

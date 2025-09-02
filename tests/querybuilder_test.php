@@ -16,7 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
-use local_sqlquerybuilder\querybuilder;
+use local_sqlquerybuilder\db;
+use local_sqlquerybuilder\columns\column;
 
 /**
  * The query_builder_test test class.
@@ -43,8 +44,7 @@ final class querybuilder_test extends \advanced_testcase {
         $expected = $DB->get_records('user');
 
         // Actual result using our query builder.
-        $QB = new querybuilder();
-        $actual = $QB->table('user')->get();
+        $actual = db::table('user')->get();
 
         // If your query builder returns associative array with ids as keys,
         // then we can compare directly. Otherwise, normalise both.
@@ -81,8 +81,7 @@ final class querybuilder_test extends \advanced_testcase {
         $expected = $DB->get_record('user', [], '*', IGNORE_MULTIPLE);
 
         // Actual "first" record using query builder.
-        $QB = new querybuilder();
-        $actual = $QB->table('user')->first();
+        $actual = db::table('user')->first();
 
         // Assert both are stdClass and have the same ID.
         $this->assertInstanceOf(\stdClass::class, $actual);
@@ -104,8 +103,7 @@ final class querybuilder_test extends \advanced_testcase {
         $expected = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
 
         // Actual record using query builder.
-        $QB = new querybuilder();
-        $actual = $QB->table('user')->find($user->id);
+        $actual = db::table('user')->find($user->id);
 
         $this->assertInstanceOf(\stdClass::class, $actual);
         $this->assertEquals((array)$expected, (array)$actual);
@@ -114,8 +112,7 @@ final class querybuilder_test extends \advanced_testcase {
     public function test_find_returns_null_for_missing_id(): void {
         $this->resetAfterTest(true);
 
-        $QB = new querybuilder();
-        $result = $QB->table('user')->find(999999);
+        $result = db::table('user')->find(999999);
         $this->assertFalse($result, 'Should return null when record not found');
     }
 
@@ -132,8 +129,7 @@ final class querybuilder_test extends \advanced_testcase {
         $expected = $DB->get_records('user', ['firstname' => 'Paul']);
 
         // Actual result using query builder.
-        $QB = new querybuilder();
-        $actual = $QB->table('user')->where('firstname', '=', 'Paul')->get();
+        $actual = db::table('user')->where('firstname', '=', 'Paul')->get();
 
         // Compare IDs.
         $this->assertEquals(array_keys($expected), array_keys($actual));
@@ -157,8 +153,7 @@ final class querybuilder_test extends \advanced_testcase {
         $expected = $DB->get_records_select('user', "firstname <> :name", ['name' => 'Paul']);
 
         // Actual result using query builder.
-        $QB = new querybuilder();
-        $actual = $QB->table('user')->where('firstname', '<>', 'Paul')->get();
+        $actual = db::table('user')->where('firstname', '<>', 'Paul')->get();
 
         // Compare IDs.
         $this->assertEquals(array_keys($expected), array_keys($actual));
