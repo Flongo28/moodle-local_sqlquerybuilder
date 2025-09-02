@@ -33,8 +33,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $expected = "SELECT username FROM {user} WHERE suspended = 1";
 
         $actual = db::table('user')
-            // TODO: we want nicer syntax: $q->select('username');
-            ->select([new column('username')])
+            ->select('username')
             ->where('suspended', '=', 1)
             ->to_sql();
 
