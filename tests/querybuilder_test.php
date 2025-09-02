@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\tests;
+namespace local_sqlquerybuilder;
 
 use local_sqlquerybuilder\querybuilder;
 
@@ -117,6 +117,56 @@ final class querybuilder_test extends \advanced_testcase {
         $QB = new querybuilder();
         $result = $QB->table('user')->find(999999);
         $this->assertFalse($result, 'Should return null when record not found');
+    }
+
+    public function test_where_clause_get(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $paul = $generator->create_user(['firstname' => 'Paul']);
+        $john = $generator->create_user(['firstname' => 'John']);
+
+        // Expected result using Moodle DB API.
+        $expected = $DB->get_records('user', ['firstname' => 'Paul']);
+
+        // Actual result using query builder.
+        $QB = new querybuilder();
+        $actual = $QB->table('user')->where('firstname', '=', 'Paul')->get();
+
+        // Compare IDs.
+        $this->assertEquals(array_keys($expected), array_keys($actual));
+
+        // Compare record content.
+        foreach ($expected as $id => $user) {
+            $this->assertEquals((array)$user, (array)$actual[$id]);
+        }
+    }
+
+    public function test_where_clause_not_equal(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $paul = $generator->create_user(['firstname' => 'Paul']);
+        $john = $generator->create_user(['firstname' => 'John']);
+
+        // Expected result: all users where firstname <> 'Paul'.
+        $expected = $DB->get_records_select('user', "firstname <> :name", ['name' => 'Paul']);
+
+        // Actual result using query builder.
+        $QB = new querybuilder();
+        $actual = $QB->table('user')->where('firstname', '<>', 'Paul')->get();
+
+        // Compare IDs.
+        $this->assertEquals(array_keys($expected), array_keys($actual));
+
+        // Compare record content.
+        foreach ($expected as $id => $user) {
+            $this->assertEquals((array)$user, (array)$actual[$id]);
+        }
     }
 
 }
