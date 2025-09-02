@@ -1,6 +1,8 @@
 <?php
 namespace local_sqlquerybuilder;
 
+use stdClass;
+
 class querybuilder {
 
     protected $table;
@@ -16,13 +18,13 @@ class querybuilder {
         return $DB->get_records($this->table);
     }
 
-    public function first(): ?\stdClass {
+    public function first(): stdClass {
         global $DB;
         // Fetch the first record (IGNORE_MULTIPLE avoids exceptions if more than one row).
         return $DB->get_record($this->table, [], '*', IGNORE_MULTIPLE);
     }
 
-    public function find(int $id) {
+    public function find(int $id): stdClass|bool {
         global $DB;
         return $DB->get_record($this->table, ['id' => $id]);
     }
