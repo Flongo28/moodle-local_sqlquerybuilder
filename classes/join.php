@@ -34,21 +34,21 @@ trait join {
     protected function get_allowed_table_aliases(): array {
 
     }
-    protected function join($table, $first, $operator, $second) {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::INNER];
+    protected function join($table, $first, $operator, $second , $alias = '') {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::INNER, $alias];
     }
 
-    protected function leftjoin($table, $first, $operator, $second) {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::LEFT];
+    protected function leftjoin($table, $first, $operator, $second, $alias = '') {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::LEFT, $alias];
     }
-    protected function rightjoin($table, $first, $operator, $second) {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::RIGHT];
+    protected function rightjoin($table, $first, $operator, $second, $alias = '') {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::RIGHT, $alias];
     }
-    protected function fulljoin($table, $first, $operator, $second) {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::FULL];
+    protected function fulljoin($table, $first, $operator, $second, $alias = '') {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::FULL, $alias];
     }
-/*     protected function crossjoin($table, $first, $operator, $second) {
-        $this->joins[] = [$table, $first, $operator, $second, join_type::CROSS];
+/*     protected function crossjoin($table, $first, $operator, $second, $alias = '') {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::CROSS, $alias];
     } */
     protected function export_join(): string {
         if (empty($this->joins)){
@@ -56,7 +56,7 @@ trait join {
         }
         $joinclause = '';
         foreach ($this->joins as $join) {
-            $joinclause .= $join[4]->value . ' JOIN ' . $join[0] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+            $joinclause .= $join[4]->value . ' JOIN ' . $join[0] . ' ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
         }
         return $joinclause;
     }
