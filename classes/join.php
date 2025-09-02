@@ -18,6 +18,7 @@ namespace local_sqlquerybuilder;
 
 
 use local_sqlquerybuilder\joins\join_expression;
+use local_sqlquerybuilder\joins\join_type;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -33,8 +34,30 @@ trait join {
     protected function get_allowed_table_aliases(): array {
 
     }
+    protected function join($table, $first, $operator, $second) {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::INNER];
+    }
 
+    protected function leftjoin($table, $first, $operator, $second) {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::LEFT];
+    }
+    protected function rightjoin($table, $first, $operator, $second) {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::RIGHT];
+    }
+    protected function fulljoin($table, $first, $operator, $second) {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::FULL];
+    }
+/*     protected function crossjoin($table, $first, $operator, $second) {
+        $this->joins[] = [$table, $first, $operator, $second, join_type::CROSS];
+    } */
     protected function export_join(): string {
-
+        if (empty($this->joins)){
+            return '';
+        }
+        $joinclause = '';
+        foreach ($this->joins as $join) {
+            $joinclause .= $join[4]->value . ' JOIN ' . $join[0] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+        }
+        return $joinclause;
     }
 }
