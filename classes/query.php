@@ -19,6 +19,7 @@ namespace local_sqlquerybuilder;
 use stdClass;
 use local_sqlquerybuilder\select;
 use local_sqlquerybuilder\where;
+use local_sqlquerybuilder\join;
 
 /**
  * A Query builder
@@ -29,7 +30,7 @@ use local_sqlquerybuilder\where;
  */
 
 class query {
-    use select, where;
+    use select, where, join;
 
     /**
      * @param string $from table which concerns the query
