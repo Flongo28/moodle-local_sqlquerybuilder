@@ -124,7 +124,7 @@ trait where {
         return $this;
     }
 
-    q
+    
     /**
      * Export the WHERE clause as a SQL string.
      *
