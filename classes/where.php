@@ -22,7 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_sql_query_builder;
+namespace local_sqlquerybuilder;
 
 defined('MOODLE_INTERNAL') || die();
 
