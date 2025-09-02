@@ -36,19 +36,24 @@ trait join {
     }
     public function join($table, $first, $operator, $second , $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::INNER, $alias];
+        return $this;
     }
 
     public function leftjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::LEFT, $alias];
+        return $this;
     }
     public function rightjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::RIGHT, $alias];
+        return $this;
     }
     public function fulljoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::FULL, $alias];
+        return $this;
     }
 /*     public function crossjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::CROSS, $alias];
+        return $this;
     } */
     protected function export_join(): string {
         if (empty($this->joins)){
