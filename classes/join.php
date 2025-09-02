@@ -61,7 +61,7 @@ trait join {
         }
         $joinclause = '';
         foreach ($this->joins as $join) {
-            $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+            $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . 'ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
         }
         return $joinclause;
     }

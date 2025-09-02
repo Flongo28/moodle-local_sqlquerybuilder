@@ -144,7 +144,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     public function test_a_query_with_joins(): void {
         $expected = "SELECT * FROM {user} "
-            . "JOIN {user_enrolments} ON user.id = user_enrolments.id";
+            . "JOIN {user_enrolments} ON user_enrolments.id = user.id";
 
         $actual = db::table('user')
             ->join('user_enrolments', 'user_enrolments.id', '=', 'user.id')
