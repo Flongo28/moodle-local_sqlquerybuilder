@@ -130,9 +130,12 @@ trait where {
      *
      * @return string The complete WHERE clause SQL string
      */
-    public function export_where() {
+    protected function export_where() {
         $whereclause = ' WHERE ';
         $first_iteration = true;
+        if (empty($this->whereconditions)){
+            return '';
+        }
         foreach ($this->whereconditions as $condition) {
             if (!$first_iteration){
                 $whereclause .= $condition['type'] . ' ';
