@@ -137,13 +137,18 @@ trait where {
             return '';
         }
         foreach ($this->whereconditions as $condition) {
+            if (is_string($condition['value'])) {
+                $value = "'" . $condition['value'] . "'";
+            } else {
+                $value = $condition['value'];
+            }
             if (!$first_iteration){
                 $whereclause .= $condition['type'] . ' ';
             }
             if ($condition['negative']){
                 $whereclause .= 'NOT ';
             }
-            $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $condition['value'] . ' ';
+            $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $value . ' ';
         }
         return $whereclause;
     }
