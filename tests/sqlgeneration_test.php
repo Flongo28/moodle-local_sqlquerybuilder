@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder;
 
-use local_sqlquerybuilder\query;
+use local_sqlquerybuilder\db;
 use local_sqlquerybuilder\columns\column;
 
 /**
@@ -27,17 +27,17 @@ use local_sqlquerybuilder\columns\column;
  * @copyright   2025 Daniel Meißner
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class query_test extends \advanced_testcase {
+final class sqlgeneration_test extends \advanced_testcase {
 
     public function test_a_simple_query(): void {
         $expected = "SELECT username FROM {user} WHERE suspended = 1";
 
-        $q = new query('user');
-        // TODO: we want nicer syntax: $q->select('username');
-        $q->select([new column('username')]);
-        $q->where('suspended', '=', 1);
+        $actual = db::table('user')
+            // TODO: we want nicer syntax: $q->select('username');
+            ->select([new column('username')])
+            ->where('suspended', '=', 1)
+            ->to_sql();
 
-        $actual = $q->to_sql();
         $this->assertEquals($expected, $actual);
     }
 }
