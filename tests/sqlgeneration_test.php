@@ -28,6 +28,97 @@ use local_sqlquerybuilder\columns\column;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sqlgeneration_test extends \advanced_testcase {
+    /**
+     * Tests if everything get selected if no calls where made
+     */
+    public function test_no_select() {
+        $expected = "SELECT * FROM {user}";
+
+        $actual = db::table('user')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if selecting a count is possible
+     */
+    public function test_count() {
+        $expected = "SELECT COUNT(1) FROM {user}";
+
+        $actual = db::table('user')
+            ->select_count()
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if selecting a sum is possible
+     */
+    public function test_sum() {
+        $expected = "SELECT SUM(suspended) AS count_suspended FROM {user}";
+
+        $actual = db::table('user')
+            ->select_sum('suspended', 'count_suspended')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if selecting a maximum is possible
+     */
+    public function test_maximum() {
+        $expected = "SELECT MAX(timecreated) AS lastcreated FROM {user}";
+
+        $actual = db::table('user')
+            ->select_max('timecreated', 'lastcreated')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if selecting a minimum is possible
+     */
+    public function test_minimum() {
+        $expected = "SELECT MIN(timecreated) AS firstcreated FROM {user}";
+
+        $actual = db::table('user')
+            ->select_min('timecreated', 'firstcreated')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if multiple selects are possible
+     */
+    public function test_multiple_selects() {
+        $expected = "SELECT (username) AS uname, (email) AS mail, (deleted) AS d FROM {user}";
+
+        $actual = db::table('user')
+            ->select('username', 'uname')
+            ->select('email', 'mail')
+            ->select('deleted', 'd')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Tests if the alias in selects is working
+     */
+    public function test_alias(): void {
+        $expected = "SELECT (username) AS uname FROM {user}";
+
+        $actual = db::table('user')
+            ->select('username', 'uname')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
 
     public function test_a_simple_query(): void {
         $expected = "SELECT username FROM {user} WHERE suspended = 1";
