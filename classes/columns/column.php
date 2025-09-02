@@ -23,20 +23,37 @@ namespace local_sqlquerybuilder\columns;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column implements column_expression {
+    /** @var string|null Name of the table to call the column from */
+    private ?string $table;
     /** @var string Name of the column */
     private string $name;
     /** @var string|null Alias for the column name */
-    private ?string $alias;
+    protected ?string $alias;
 
     /**
      * Constructor
      *
      * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      */
-    public function __construct(string $name, ?string $alias = null) {
+    public function __construct(string $name, ?string $table = null, ?string $alias = null) {
+        $this->table = $table;
         $this->name = $name;
         $this->alias = $alias;
+    }
+
+    /**
+     * Gets the locator with table and column for a select part
+     *
+     * @return string locator e.g. u.username
+     */
+    protected function get_column_locator(): string {
+        if ($this->table !== null) {
+            return  "$this->table.$this->name";
+        }
+
+        return $this->name;
     }
 
     /**
@@ -45,10 +62,21 @@ class column implements column_expression {
      * @return string column for select as sql
      */
     public function export(): string {
+        $locator = $this->get_column_locator();
+
         if ($this->alias === null) {
-            return $this->name;
+            return $locator;
         }
 
-        return "$this->name $this->alias";
+        return "($locator) AS $this->alias";
+    }
+
+    /**
+     * Can be used with other columns
+     *
+     * @return bool False
+     */
+    public function standalone(): bool {
+        return false;
     }
 }

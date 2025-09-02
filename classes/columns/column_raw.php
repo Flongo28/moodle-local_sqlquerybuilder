@@ -25,13 +25,15 @@ namespace local_sqlquerybuilder\columns;
 class column_raw implements column_expression {
     /** @var string Raw sql column */
     private string $sql;
+    /** @var bool Should be the only column used */
+    private bool $onlycolumn;
 
     /**
      * Constructor
      *
      * @param string $sql raw sql column
      */
-    public function __construct(string $sql) {
+    public function __construct(string $sql, bool $onlycolumn = false) {
         $this->sql = $sql;
     }
 
@@ -42,5 +44,14 @@ class column_raw implements column_expression {
      */
     public function export(): string {
         return $this->sql;
+    }
+
+    /**
+     * Whether this should be the only column used
+     *
+     * @return bool Specified by programmer
+     */
+    public function standalone(): bool {
+        return $this->onlycolumn;
     }
 }

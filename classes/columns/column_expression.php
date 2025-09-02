@@ -29,4 +29,11 @@ interface column_expression {
      * @return string column for select as sql
      */
     public function export(): string;
+
+    /**
+     * Whether the column should be the only selected one
+     *
+     * @return bool if true, this column should be the only one
+     */
+    public function standalone(): bool;
 }

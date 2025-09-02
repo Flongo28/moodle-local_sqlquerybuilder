@@ -22,12 +22,8 @@ namespace local_sqlquerybuilder\columns;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class column_aggregate implements column_expression {
-    /** @var string Name of the column */
-    private string $name;
-    /** @var string|null Alias for the column name */
-    private ?string $alias;
-    /** @var aggregation Aggregation method */
+class column_aggregate extends column {
+    /** @var aggregation Type of aggregation */
     private aggregation $type;
 
     /**
@@ -35,12 +31,12 @@ class column_aggregate implements column_expression {
      *
      * @param aggregation $type Aggregation type to use
      * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
      * @param string|null $alias Alias for the column name
      */
-    public function __construct(aggregation $type, string $name, ?string $alias = null) {
+    public function __construct(aggregation $type, string $name, ?string $table = null, ?string $alias = null) {
         $this->type = $type;
-        $this->name = $name;
-        $this->alias = $alias;
+        parent::__construct($name, $table, $alias);
     }
 
     /**
@@ -49,12 +45,22 @@ class column_aggregate implements column_expression {
      * @return string column for select as sql
      */
     public function export(): string {
-        $column = $this->type->value . "($this->name)";
+        $locator = $this->get_column_locator();
+        $column = $this->type->value . "($locator)";
 
         if ($this->alias !== null) {
-            $column .= " $this->alias";
+            $column .= " AS $this->alias";
         }
 
         return $column;
+    }
+
+    /**
+     * Should be the only column used
+     *
+     * @return bool True
+     */
+    public function standalone(): bool {
+        return true;
     }
 }

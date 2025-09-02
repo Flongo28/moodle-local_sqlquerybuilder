@@ -16,8 +16,11 @@
 
 namespace local_sqlquerybuilder;
 
+use local_sqlquerybuilder\columns\aggregation;
+use local_sqlquerybuilder\columns\column_aggregate;
 use local_sqlquerybuilder\columns\column_expression;
 use local_sqlquerybuilder\columns\column_raw;
+use local_sqlquerybuilder\columns\column;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -28,29 +31,90 @@ use local_sqlquerybuilder\columns\column_raw;
  */
 trait select {
     /** @var column_expression[] SQL Select Parts */
-    public array $select = [];
+    protected array $select = [];
 
     /** @var bool Whether to use DISTINCT OR ALL */
-    public bool $distinct = false;
-
-    /**
-     * Selects an array of columns
-     *
-     * @param column_expression[] $columns
-     * @return $this Instance of the Builder
-     */
-    public function select(array $columns): static {
-        $this->select = $columns;
-        return $this;
-    }
+    protected bool $distinct = false;
 
     /**
      * Selects all columns
      *
+     * Should not be used with other selects
+     *
      * @return $this Instance of the Builder
      */
     public function select_all(): static {
-        $this->select = [new column_raw('*')];
+        $this->select = [new column_raw('*', true)];
+        return $this;
+    }
+
+    /**
+     * Selects an array of columns
+     *
+     * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
+     * @param string|null $alias Alias for the column name
+     * @return $this Instance of the Builder
+     */
+    public function select(string $name, ?string $table = null, ?string $alias = null): static {
+        $this->select[] = new column($name, $table, $alias);
+        return $this;
+    }
+
+    /**
+     * Gives back the count of all entries
+     *
+     * Should not be used with other selects
+     *
+     * @return $this Instance of the Builder
+     */
+    public function select_count(): static {
+        $this->select[] = new column_aggregate(aggregation::COUNT, '1');
+        return $this;
+    }
+
+    /**
+     * Gives back only the maximum of the defined parameter
+     *
+     * Should not be used with other selects
+     *
+     * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
+     * @param string|null $alias Alias for the column name
+     * @return $this Instance of the Builder
+     */
+    public function select_max(string $name, ?string $table = null, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::MAX, $name, $table, $alias);
+        return $this;
+    }
+
+    /**
+     * Gives back only the minimum of the defined parameter
+     *
+     * Should not be used with other selects
+     *
+     * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
+     * @param string|null $alias Alias for the column name
+     * @return $this Instance of the Builder
+     */
+    public function select_min(string $name, ?string $table = null, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::MIN, $name, $table, $alias);
+        return $this;
+    }
+
+    /**
+     * Gives back only the sum of the defined parameter
+     *
+     * Should not be used with other selects
+     *
+     * @param string $name Name of the column
+     * @param string|null $table Name of the table to call from
+     * @param string|null $alias Alias for the column name
+     * @return $this Instance of the Builder
+     */
+    public function select_sum(string $name, ?string $table = null, ?string $alias = null): static {
+        $this->select[] = new column_aggregate(aggregation::SUM, $name, $table, $alias);
         return $this;
     }
 
