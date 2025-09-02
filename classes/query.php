@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_sql_query_builder;
+namespace local_sqlquerybuilder;
 
 /**
  * A Query builder
  *
- * @package   local_sql_query_builder
+ * @package   local_sqlquerybuilder
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
