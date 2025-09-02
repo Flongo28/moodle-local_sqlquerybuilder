@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     local_sql_query_builder
+ * @package     local_sqlquerybuilder
  * @category    string
  * @copyright   2025 Your Name <you@example.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
