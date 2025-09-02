@@ -34,20 +34,20 @@ trait join {
     protected function get_allowed_table_aliases(): array {
 
     }
-    protected function join($table, $first, $operator, $second , $alias = '') {
+    public function join($table, $first, $operator, $second , $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_type::INNER, $alias];
     }
 
-    protected function leftjoin($table, $first, $operator, $second, $alias = '') {
+    public function leftjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_type::LEFT, $alias];
     }
-    protected function rightjoin($table, $first, $operator, $second, $alias = '') {
+    public function rightjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_type::RIGHT, $alias];
     }
-    protected function fulljoin($table, $first, $operator, $second, $alias = '') {
+    public function fulljoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_type::FULL, $alias];
     }
-/*     protected function crossjoin($table, $first, $operator, $second, $alias = '') {
+/*     public function crossjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_type::CROSS, $alias];
     } */
     protected function export_join(): string {
