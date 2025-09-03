@@ -24,8 +24,6 @@
 
 namespace local_sqlquerybuilder;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Trait for handling WHERE conditions in SQL queries.
  *
