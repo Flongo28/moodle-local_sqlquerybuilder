@@ -213,6 +213,30 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    public function test_simple_where_in_clause(): void {
+        $expected = "SELECT * FROM {unknown} WHERE field IN (1, 2, 3)";
+
+        $actual = db::table('unknown')
+            ->where_in('field', [1, 2, 3])
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function test_subquery_where_in_clause(): void {
+        $expected = "SELECT * FROM {unknown} WHERE field IN (SELECT id FROM {course} WHERE timestart > 1)";
+
+        $latestcourses = db::table('course')
+            ->select('id')
+            ->where('timestart', '>', 1);
+
+        $actual = db::table('unknown')
+            ->where_in('field', $latestcourses)
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * Test query with joins
      *
