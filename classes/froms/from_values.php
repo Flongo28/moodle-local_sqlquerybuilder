@@ -21,6 +21,7 @@ use Stringable;
 /**
  * Data select from custom given values
  *
+ * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,8 +34,17 @@ class from_values implements from_expression {
      * @param string $tablename Name of the table, only used if aliases are given
      */
     public function __construct(
+        /**
+         * @var array|null table
+         */
         private array $table,
+        /**
+         * @var array|null table asliases
+         */
         private ?array $aliases,
+        /**
+         * @var string table name
+         */
         private string $tablename,
     ) {
     }

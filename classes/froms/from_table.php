@@ -21,6 +21,7 @@ namespace local_sqlquerybuilder\froms;
  *
  * e.g. a table from the database
  *
+ * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,7 +33,13 @@ class from_table implements from_expression {
      * @param string|null $alias Alias for the tablename
      */
     public function __construct(
+        /**
+         * @var string|null table name
+         */
         private string $table,
+        /**
+         * @var string|null table alias
+         */
         private ?string $alias,
     ) {
     }

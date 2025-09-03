@@ -19,6 +19,7 @@ namespace local_sqlquerybuilder\froms;
 /**
  * Interface for from types
  *
+ * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
