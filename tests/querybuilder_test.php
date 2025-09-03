@@ -24,7 +24,7 @@ use local_sqlquerybuilder\columns\column;
  *
  * @package     local_sqlquerybuilder
  * @category    test
- * @copyright   2025 Your Name <you@example.com>
+ * @copyright   2025 Matthias Opitz <m.opitz@ucl.ac.uk>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class querybuilder_test extends \advanced_testcase {

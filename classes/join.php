@@ -25,6 +25,7 @@ use local_sqlquerybuilder\query;
  * Trait that builds a sql statement, that can be exported via
  * build_join()
  *
+ * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,55 +33,153 @@ trait join {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 
+    /**
+     * Get the allowed table aliases
+     *
+     * @return array
+     */
     protected function get_allowed_table_aliases(): array {
 
     }
-    public function join($table, $first, $operator, $second , $alias = '') {
+
+    /**
+     * join
+     *
+     * @param string $table
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function join(string $table, string $first, string $operator, string $second , string $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::INNER, $alias];
         return $this;
     }
 
-    public function leftjoin($table, $first, $operator, $second, $alias = '') {
+    /**
+     * left join
+     *
+     * @param string $table
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function leftjoin(string $table, string $first, string $operator, string $second , string $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::LEFT, $alias];
         return $this;
     }
-    public function rightjoin($table, $first, $operator, $second, $alias = '') {
+
+    /**
+     * right join
+     *
+     * @param string $table
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function rightjoin(string $table, string $first, string $operator, string $second , string $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::RIGHT, $alias];
         return $this;
     }
-    public function fulljoin($table, $first, $operator, $second, $alias = '') {
+
+    /**
+     * full join
+     *
+     * @param string $table
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function fulljoin(string $table, string $first, string $operator, string $second , string $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::FULL, $alias];
         return $this;
     }
 
-    public function joinSub(query $query, $first, $operator, $second, $alias) {
+    /**
+     * sub join
+     *
+     * @param \local_sqlquerybuilder\query $query
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function joinsub(query $query, string $first, string $operator, string $second, string $alias) {
         $this->joins[] = [$query, $first, $operator, $second, join_types::INNER, $alias];
         return $this;
     }
 
-    public function leftJoinSub(query $query, $first, $operator, $second, $alias) {
+    /**
+     * sub left join
+     *
+     * @param \local_sqlquerybuilder\query $query
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function leftjoinsub(query $query, string $first, string $operator, string $second, string $alias) {
         $this->joins[] = [$query, $first, $operator, $second, join_types::LEFT, $alias];
         return $this;
     }
 
-    public function rightJoinSub(query $query, $first, $operator, $second, $alias) {
+    /**
+     * sub right join
+     *
+     * @param \local_sqlquerybuilder\query $query
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function rightjoinsub(query $query, string $first, string $operator, string $second, string $alias) {
         $this->joins[] = [$query, $first, $operator, $second, join_types::RIGHT, $alias];
         return $this;
     }
-/*     public function crossjoin($table, $first, $operator, $second, $alias = '') {
+
+    // Todo: preliminary function - do not use.
+    /**
+     * cross join
+     *
+     * @param string $table
+     * @param string $first
+     * @param string $operator
+     * @param string $second
+     * @param string $alias
+     * @return $this
+     */
+    public function crossjoin(string $table, string $first, string $operator, string $second, string $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::CROSS, $alias];
         return $this;
-    } */
+    }
+
+    /**
+     * export join string
+     *
+     * @return string
+     */
     protected function export_join(): string {
-        if (empty($this->joins)){
+        if (empty($this->joins)) {
             return '';
         }
         $joinclause = '';
         foreach ($this->joins as $join) {
             if ($join[0] instanceof query) {
-                $joinclause .= $join[4]->value . ' JOIN (' . $join[0]->to_sql() . ') ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+                $joinclause .= $join[4]->value . ' JOIN (' . $join[0]->to_sql() . ') ' . $join[5] . ' ON ' . $join[1] .
+                    ' ' . $join[2] . ' ' . $join[3] . ' ';
             } else {
-                $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+                $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . ' ON ' . $join[1] .
+                    ' ' . $join[2] . ' ' . $join[3] . ' ';
             }
         }
         return preg_replace('/\s{2,}/', ' ', $joinclause);
