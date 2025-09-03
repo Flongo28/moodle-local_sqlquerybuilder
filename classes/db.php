@@ -17,7 +17,9 @@
 namespace local_sqlquerybuilder;
 
 use Stringable;
+use local_sqlquerybuilder\query;
 use local_sqlquerybuilder\froms\from_table;
+use local_sqlquerybuilder\froms\from_query;
 use local_sqlquerybuilder\froms\from_values;
 
 /**
@@ -35,8 +37,12 @@ class db {
      * @param string|null $alias Alias for the tablename
      * @return query
      */
-    public static function table(string $name, ?string $alias = null): query {
-        return new query(new from_table($name, $alias));
+    public static function table(string|query $nameorquery, ?string $alias = null): query {
+        if (is_string($nameorquery)) {
+            return new query(new from_table($nameorquery, $alias));
+        } else if ($nameorquery instanceof query) {
+            return new query(new from_query($nameorquery, $alias));
+        }
     }
 
     /**

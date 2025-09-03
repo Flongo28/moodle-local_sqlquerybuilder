@@ -244,6 +244,18 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    public function test_from_with_subquery(): void {
+        $expected = "SELECT * FROM (SELECT username FROM {user} u WHERE u.id = 3)";
+
+        $subquery = db::table('user', 'u')
+            ->select('username')
+            ->where('u.id', '=', 3);
+
+        $actual = db::table($subquery)->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * Test query with joins
      *
