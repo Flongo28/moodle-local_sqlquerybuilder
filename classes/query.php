@@ -16,10 +16,13 @@
 
 namespace local_sqlquerybuilder;
 
+use core\exception\coding_exception;
+use Matrix\Exception;
 use stdClass;
 use local_sqlquerybuilder\select;
 use local_sqlquerybuilder\where;
 use local_sqlquerybuilder\join;
+use Stringable;
 
 /**
  * A Query builder
@@ -37,6 +40,40 @@ class query {
      * @param string $fromAlias alias for the from source
      */
     public function __construct(private string $from, private ?string $fromAlias) {
+    }
+
+    /**
+     * Creates a query based on a custom table with specified values.
+     *
+     * @param Stringable[][] $table Table with the structure of row[entry]
+     * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
+     * @param string $tablename Name of the table, only used if aliases are given
+     * @return static Instance of the query class
+     */
+    public static function from_values(
+        array $table,
+        ?array $aliases = null,
+        string $tablename = "custom_value_table"
+    ): static {
+        $from = "VALUES(\n";
+
+        foreach ($table as $row) {
+            $from .= "(";
+
+            foreach ($row as $colval) {
+                $from .= "($colval)";
+            }
+
+            $from .= ")";
+        }
+
+        $from .= ")";
+
+        if (!is_null($aliases)) {
+            $from .= " AS $tablename(" . implode(',', $aliases) . ")";
+        }
+
+        return new static($from);
     }
 
     /**
