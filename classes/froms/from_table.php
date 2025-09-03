@@ -56,7 +56,7 @@ class from_table implements from_expression {
         }
 
         if (is_null($this->alias)) {
-            return "{" . $this->table . "}";
+            return "{" . $this->table . "} ";
         }
 
         return "{" . $this->table . "} " . $this->alias . " ";
