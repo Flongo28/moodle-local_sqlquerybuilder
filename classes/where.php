@@ -24,6 +24,9 @@
 
 namespace local_sqlquerybuilder;
 
+use core\clock;
+use core\di;
+
 /**
  * Trait for handling WHERE conditions in SQL queries.
  *
@@ -211,6 +214,29 @@ trait where {
         ];
         return $this;
     }
+
+    /**
+     * Checks if the given time is between the two columns
+     * If any of these columns are 0, they will not be checked
+     *
+     * @param string $columntimestart Column with start time
+     * @param string $columntimeend Column with end time
+     * @param int|null $timebetween Timestamp which will be checked to be between the start and end
+     *                              If null checks for the current time
+     * @return static Itself
+     */
+    public function time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null): static {
+        if (is_null($timebetween)) {
+            $timebetween = di::get(clock::class)->time();
+        }
+
+        $this->where($columntimestart, '=', 0);
+        $this->orwhere($columntimestart, '<=', $timebetween);
+        $this->where($columntimeend, '=', 0);
+        $this->orwhere($columntimeend, '>=', $timebetween);
+        return $this;
+    }
+
     /**
      * Export the WHERE clause as a SQL string.
      *
