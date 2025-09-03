@@ -69,8 +69,8 @@ final class complexquery_test extends \advanced_testcase {
         // Actual result using query builder.
         $actual = db::table('enrol', 'e')
             ->distinct()
-            ->join('user_enrolments', 'ue.enrolid', '=', 'e.id', 'ue')
-            ->join('user', 'u.id', '=', 'ue.userid', 'u')
+            ->join('user_enrolments', ['ue.enrolid', '=', 'e.id'], 'ue')
+            ->join('user', ['u.id', '=', 'ue.userid'], 'u')
             ->select('ue.userid')
             ->where('ue.status', '=', 0)
             ->where('u.deleted', '=', 0)
