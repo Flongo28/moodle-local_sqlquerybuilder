@@ -56,7 +56,7 @@ trait where {
             'column' => $column,
             'operator' => $operator,
             'value' => $value,
-            'negative' => false,
+            'negation' => false,
         ];
 
         return $this;
@@ -76,7 +76,7 @@ trait where {
             'column' => $column,
             'operator' => $operator,
             'value' => $value,
-            'negative' => false,
+            'negation' => false,
         ];
 
         return $this;
@@ -98,7 +98,7 @@ trait where {
             'column' => $column,
             'operator' => $operator,
             'value' => $value,
-            'negative' => true,
+            'negation' => true,
         ];
 
         return $this;
@@ -118,13 +118,80 @@ trait where {
             'column' => $column,
             'operator' => $operator,
             'value' => $value,
-            'negative' => true,
+            'negation' => true,
         ];
 
         return $this;
     }
 
-    
+    /**
+     * Add a WHERE NULL condition with AND logic.
+     *
+     * @param string $column The column name
+     * @return $this For method chaining
+     */
+
+    public function wherenull($column) {
+        $this->whereconditions[] = [
+            'type' => 'AND',
+            'column' => $column,
+            'operator' => 'IS NULL',
+            'value' => '',
+            'negation' => false,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NULL condition with OR logic.
+     *
+     * @param string $column The column name
+     * @return $this For method chaining
+     */
+    public function orwherenull($column) {
+        $this->whereconditions[] = [
+            'type' => 'OR',
+            'column' => $column,
+            'operator' => 'IS NULL',
+            'value' => '',
+            'negation' => false,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Add a WHERE NOT NULL condition with AND logic.
+     *
+     * @param string $column The column name
+     * @return $this For method chaining
+     */
+    public function wherenotnull($column) {
+        $this->whereconditions[] = [
+            'type' => 'AND',
+            'column' => $column,
+            'operator' => 'IS NOT NULL',
+            'value' => '',
+            'negation' => false,
+        ];
+    }
+
+    /**
+     * Add a WHERE NOT NULL condition with OR logic.
+     *
+     * @param string $column The column name
+     * @return $this For method chaining
+     */
+    public function orwherenotnull($column) {
+        $this->whereconditions[] = [
+            'type' => 'OR',
+            'column' => $column,
+            'operator' => 'IS NOT NULL',
+            'value' => '',
+            'negation' => false,
+        ];
+    }
     /**
      * Export the WHERE clause as a SQL string.
      *
@@ -137,15 +204,17 @@ trait where {
             return '';
         }
         foreach ($this->whereconditions as $condition) {
-            if (is_string($condition['value'])) {
+            if (!empty($condition['value']) && is_string($condition['value'])) {
                 $value = "'" . $condition['value'] . "'";
             } else {
                 $value = $condition['value'];
             }
             if (!$first_iteration){
                 $whereclause .= $condition['type'] . ' ';
+            } else {
+                $first_iteration = false;
             }
-            if ($condition['negative']){
+            if ($condition['negation']){
                 $whereclause .= 'NOT ';
             }
             $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $value . ' ';
