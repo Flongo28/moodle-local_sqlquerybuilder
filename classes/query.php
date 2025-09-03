@@ -28,7 +28,7 @@ use stdClass;
  */
 
 class query {
-    use select, where, join;
+    use select, where, join, grouping;
 
     /**
      * @param from_expression $from table which concerns the query
@@ -44,7 +44,8 @@ class query {
         $sql = $this->export_select() . " "
             . "FROM " . $this->from->export(true)
             . $this->export_join()
-            . $this->export_where();
+            . $this->export_where()
+            . $this->export_grouping();
 
         return trim($sql);
     }
