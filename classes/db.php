@@ -16,7 +16,9 @@
 
 namespace local_sqlquerybuilder;
 
-use local_sqlquerybuilder\query;
+use Stringable;
+use local_sqlquerybuilder\froms\from_table;
+use local_sqlquerybuilder\froms\from_values;
 
 /**
  * Syntactic sugar for the query object
@@ -25,15 +27,30 @@ use local_sqlquerybuilder\query;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class db {
 
     /**
      * Return a new query object for the given table.
-     * @param string name the table name
+     * @param string $name Name the table name
+     * @param string|null $alias Alias for the tablename
      * @return query
      */
     public static function table(string $name, ?string $alias = null): query {
-        return new query($name, $alias);
+        return new query(new from_table($name, $alias));
+    }
+
+    /**
+     * Creates a query on a custom made query
+     *
+     * @param Stringable[][] $table Table with the structure of row[entry]
+     * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
+     * @param string $tablename Name of the table, only used if aliases are given
+     */
+    public static function from_values(
+        array $table,
+        ?array $aliases = null,
+        string $tablename = "custom_value_table",
+    ) {
+        return new query(new from_values($table, $aliases, $tablename));
     }
 }

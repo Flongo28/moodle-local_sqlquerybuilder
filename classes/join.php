@@ -182,6 +182,6 @@ trait join {
                     ' ' . $join[2] . ' ' . $join[3] . ' ';
             }
         }
-        return $joinclause;
+        return preg_replace('/\s{2,}/', ' ', $joinclause);
     }
 }
