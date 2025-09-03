@@ -68,7 +68,7 @@ class from_values implements from_expression {
         $from .= ")";
 
         if (!is_null($this->aliases)) {
-            $from .= " AS $this->tablename(" . implode(',', $this->aliases) . ")";
+            $from .= " AS $this->tablename(" . implode(',', $this->aliases) . ") ";
         }
 
         return $from;
