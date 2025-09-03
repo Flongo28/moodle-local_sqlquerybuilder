@@ -16,13 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
-use core\exception\coding_exception;
-use Matrix\Exception;
+use local_sqlquerybuilder\froms\from_expression;
 use stdClass;
-use local_sqlquerybuilder\select;
-use local_sqlquerybuilder\where;
-use local_sqlquerybuilder\join;
-use Stringable;
 
 /**
  * A Query builder
@@ -36,44 +31,9 @@ class query {
     use select, where, join;
 
     /**
-     * @param string $from table which concerns the query
-     * @param string $fromAlias alias for the from source
+     * @param from_expression $from table which concerns the query
      */
-    public function __construct(private string $from, private ?string $fromAlias) {
-    }
-
-    /**
-     * Creates a query based on a custom table with specified values.
-     *
-     * @param Stringable[][] $table Table with the structure of row[entry]
-     * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
-     * @param string $tablename Name of the table, only used if aliases are given
-     * @return static Instance of the query class
-     */
-    public static function from_values(
-        array $table,
-        ?array $aliases = null,
-        string $tablename = "custom_value_table"
-    ): static {
-        $from = "VALUES(\n";
-
-        foreach ($table as $row) {
-            $from .= "(";
-
-            foreach ($row as $colval) {
-                $from .= "($colval)";
-            }
-
-            $from .= ")";
-        }
-
-        $from .= ")";
-
-        if (!is_null($aliases)) {
-            $from .= " AS $tablename(" . implode(',', $aliases) . ")";
-        }
-
-        return new static($from);
+    public function __construct(public from_expression $from) {
     }
 
     /**
@@ -82,7 +42,7 @@ class query {
      */
     public function to_sql(): string {
         $sql = $this->export_select() . " "
-            . $this->fromClause()
+            . "FROM " . $this->from->export(true)
             . $this->export_join()
             . $this->export_where();
 
@@ -98,14 +58,14 @@ class query {
         global $DB;
 
         if (empty($this->wheres)) {
-            $record = $DB->get_record($this->from, [], '*', IGNORE_MULTIPLE);
+            $record = $DB->get_record($this->from->export(), [], '*', IGNORE_MULTIPLE);
         } else {
             // Only supports simple '=' and '<>' for now.
             [$field, $operator, $value] = $this->wheres[0];
             if ($operator === '=') {
-                $record = $DB->get_record($this->from, [$field => $value], '*', IGNORE_MULTIPLE);
+                $record = $DB->get_record($this->from->export(), [$field => $value], '*', IGNORE_MULTIPLE);
             } else if ($operator === '<>') {
-                $records = $DB->get_records_select($this->from, "{$field} <> :val", ['val' => $value], 'id ASC', '*', 0, 1);
+                $records = $DB->get_records_select($this->from->export(), "{$field} <> :val", ['val' => $value], 'id ASC', '*', 0, 1);
                 $record = reset($records) ?: false;
             } else {
                 throw new \coding_exception("Operator $operator not supported in first()");
@@ -117,14 +77,15 @@ class query {
 
     public function find(int $id): stdClass|bool {
         global $DB;
-        return $DB->get_record($this->from, ['id' => $id]);
+        return $DB->get_record($this->from->export(), ['id' => $id]);
     }
 
-    private function fromClause(): string {
-        if ($this->fromAlias) {
-            return "FROM {{$this->from}} AS {$this->fromAlias}";
-        } else {
-            return "FROM {{$this->from}}";
-        }
+    /**
+     * Returns the sql of this query
+     *
+     * @return string Converts the query to sql
+     */
+    public function __toString(): string {
+        return $this->to_sql();
     }
 }

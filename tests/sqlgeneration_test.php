@@ -28,6 +28,20 @@ use local_sqlquerybuilder\columns\column;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sqlgeneration_test extends \advanced_testcase {
+    public function test_custom_query_from() {
+        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1), (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
+
+        $subquerya = db::table('users')
+            ->where('id', '=', 1);
+        $subqueryb = db::table('entries')
+            ->where('id', '=', 2);
+
+        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']])->to_sql();
+        $actual = str_replace("\n", '', $actual);
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * Tests if everything get selected if no calls where made
      */
@@ -132,7 +146,7 @@ final class sqlgeneration_test extends \advanced_testcase {
     }
 
     public function test_a_simple_query_with_from_alias(): void {
-        $expected = "SELECT username FROM {user} AS u WHERE suspended = 1";
+        $expected = "SELECT username FROM {user} u WHERE suspended = 1";
 
         $actual = db::table('user', 'u')
             ->select('username')
