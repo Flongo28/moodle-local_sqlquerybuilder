@@ -223,7 +223,7 @@ trait where {
      * @param string $columntimeend Column with end time
      * @param int|null $timebetween Timestamp which will be checked to be between the start and end
      *                              If null checks for the current time
-     * @return void
+     * @return static Itself
      */
     public function time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null): static {
         if (is_null($timebetween)) {
