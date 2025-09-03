@@ -131,6 +131,17 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    public function test_a_simple_query_with_from_alias(): void {
+        $expected = "SELECT username FROM {user} AS u WHERE suspended = 1";
+
+        $actual = db::table('user', 'u')
+            ->select('username')
+            ->where('suspended', '=', 1)
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
     public function test_that_a_string_in_a_where_clause_is_quoted(): void {
         $expected = "SELECT username FROM {user} WHERE username = 'Paul'";
 

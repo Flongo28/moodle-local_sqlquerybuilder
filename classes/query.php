@@ -36,7 +36,7 @@ class query {
      * @param string $from table which concerns the query
      * @param string $fromAlias alias for the from source
      */
-    public function __construct(private string $from, private string $fromAlias) {
+    public function __construct(private string $from, private ?string $fromAlias) {
     }
 
     /**
@@ -44,8 +44,8 @@ class query {
      * @return string the SQL query
      */
     public function to_sql(): string {
-        $sql = $this->export_select()
-            . $this->fromClause() . " "
+        $sql = $this->export_select() . " "
+            . $this->fromClause()
             . $this->export_join()
             . $this->export_where();
 
@@ -85,9 +85,9 @@ class query {
 
     private function fromClause(): string {
         if ($this->fromAlias) {
-            return "FROM {$this->from} AS {$this->fromAlias}";
+            return "FROM {{$this->from}} AS {$this->fromAlias}";
         } else {
-            return "FROM {$this->form}";
+            return "FROM {{$this->from}}";
         }
     }
 }
