@@ -53,8 +53,7 @@ final class sqlgeneration_test extends \advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1),
-                      (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
+        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1), (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
 
         $subquerya = db::table('users')
             ->where('id', '=', 1);
