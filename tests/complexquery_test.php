@@ -18,15 +18,13 @@ namespace local_sqlquerybuilder;
 
 use core\clock;
 use core\di;
-use local_sqlquerybuilder\db;
-use local_sqlquerybuilder\columns\column;
 
 /**
  * Testing the SQL generation
  *
  * @package     local_sqlquerybuilder
  * @category    test
- * @copyright   2025 Daniel Meißner
+ * @copyright   2025 Matthias Opitz <m.opitz@ucl.ac.uk>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class complexquery_test extends \advanced_testcase {
