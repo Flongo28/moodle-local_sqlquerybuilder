@@ -33,7 +33,7 @@ class db {
      * @param string name the table name
      * @return query
      */
-    public static function table(string $name): query {
-        return new query($name);
+    public static function table(string $name, string $alias = null): query {
+        return new query($name, $alias);
     }
 }
