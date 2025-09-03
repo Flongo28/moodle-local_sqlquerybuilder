@@ -17,7 +17,7 @@
 /**
  * Where trait for SQL query building.
  *
- * @package     local_sql_query_builder
+ * @package     local_sqlquerybuilder
  * @copyright   2025 Your Name <you@example.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,6 +38,8 @@ trait where {
      */
     protected $whereconditions = [];
 
+    // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
+    // dann gibt es keinen direkt operator/value.
     /**
      * Add a WHERE condition with AND logic.
      *
@@ -46,8 +48,6 @@ trait where {
      * @param mixed $value The value to compare against
      * @return $this For method chaining
      */
-
-     ### TODO column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] , dann gibt es keinen direkt operator/value
     public function where($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
@@ -80,7 +80,9 @@ trait where {
         return $this;
     }
 
-       /**
+    // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
+    // dann gibt es keinen direkt operator/value.
+    /**
      * Add a WHERE  not condition with AND logic.
      *
      * @param string $column The column name
@@ -88,9 +90,7 @@ trait where {
      * @param mixed $value The value to compare against
      * @return $this For method chaining
      */
-
-     ### TODO column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] , dann gibt es keinen direkt operator/value
-     public function wherenot($column, $operator, $value) {
+    public function wherenot($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
             'column' => $column,
@@ -102,7 +102,7 @@ trait where {
         return $this;
     }
 
-        /**
+    /**
      * Add a WHERE NOT condition with OR logic.
      *
      * @param string $column The column name
@@ -128,7 +128,6 @@ trait where {
      * @param string $column The column name
      * @return $this For method chaining
      */
-
     public function wherenull($column) {
         $this->whereconditions[] = [
             'type' => 'AND',
@@ -197,8 +196,8 @@ trait where {
      */
     protected function export_where() {
         $whereclause = ' WHERE ';
-        $first_iteration = true;
-        if (empty($this->whereconditions)){
+        $firstiteration = true;
+        if (empty($this->whereconditions)) {
             return '';
         }
         foreach ($this->whereconditions as $condition) {
@@ -207,12 +206,12 @@ trait where {
             } else {
                 $value = $condition['value'];
             }
-            if (!$first_iteration){
+            if (!$firstiteration) {
                 $whereclause .= $condition['type'] . ' ';
             } else {
-                $first_iteration = false;
+                $firstiteration = false;
             }
-            if ($condition['negation']){
+            if ($condition['negation']) {
                 $whereclause .= 'NOT ';
             }
             $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $value . ' ';

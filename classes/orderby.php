@@ -22,10 +22,14 @@ use local_sqlquerybuilder\orderings\ordering;
  * Trait that builds a sql statement, that can be exported via
  * export_orderby()
  *
+ * @package     local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait orderby {
+    /**
+     * @var array of orderings
+     */
     protected $orderings = [];
 
     /**

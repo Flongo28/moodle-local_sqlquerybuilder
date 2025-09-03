@@ -26,6 +26,7 @@ use local_sqlquerybuilder\columns\column;
  * Trait that builds a sql statement, that can be exported via
  * build_select()
  *
+ * @package     local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

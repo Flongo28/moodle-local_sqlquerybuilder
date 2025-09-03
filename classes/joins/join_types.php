@@ -27,5 +27,5 @@ enum join_types: string {
     case LEFT = "LEFT";
     case FULL = "FULL";
     case RIGHT = "RIGHT";
-    case CROSS = "CROSS";  ### TODO: not supported right now
+    case CROSS = "CROSS";  // Todo: not supported right now.
 }

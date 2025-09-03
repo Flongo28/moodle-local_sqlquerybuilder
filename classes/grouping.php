@@ -16,8 +16,21 @@
 
 namespace local_sqlquerybuilder;
 
+/**
+ * Grouping trait
+ *
+ * @package     local_sqlquerybuilder
+ * @copyright   2025
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 trait grouping {
+    /**
+     * @var array of group bu clauses
+     */
     protected array $groupby = [];
+    /**
+     * @var array of havings
+     */
     protected array $having = [];
 
     /**
@@ -28,7 +41,7 @@ trait grouping {
      */
     public function groupby(...$column) {
         $this->groupby = $column;
-        return $this;   
+        return $this;
     }
 
     /**
@@ -73,7 +86,6 @@ trait grouping {
      * @return string The complete GROUP BY clause SQL string
      */
     protected function export_grouping(): string {
-        $groupbyclause = '';
         if (empty($this->groupby)) {
             return '';
         }
@@ -81,13 +93,15 @@ trait grouping {
         if (empty($this->having)) {
             return $groupbyclause;
         }
-        $first_iteration = true;
+        $firstiteration = true;
         foreach ($this->having as $having) {
-            if ($first_iteration) {
-                $groupbyclause .= ' HAVING ' . $having['column'] . ' ' . $having['operator'] . ' ' . $having['value'] . ' ';
-                $first_iteration = false;
+            if ($firstiteration) {
+                $groupbyclause .= ' HAVING ' . $having['column'] . ' ' . $having['operator'] .
+                    ' ' . $having['value'] . ' ';
+                $firstiteration = false;
             } else {
-                $groupbyclause .= $having['type'] . ' ' . $having['column'] . ' ' . $having['operator'] . ' ' . $having['value'] . ' ';
+                $groupbyclause .= $having['type'] . ' ' . $having['column'] . ' ' . $having['operator'] .
+                    ' ' . $having['value'] . ' ';
             }
         }
         return preg_replace('/\s{2,}/', ' ', $groupbyclause);

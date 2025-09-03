@@ -19,6 +19,7 @@ namespace local_sqlquerybuilder\orderings;
 /**
  * Represents an ordering
  *
+ * @package     local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +31,13 @@ class ordering {
      * @param bool $ascending Whether to filter ascending or descending
      */
     public function __construct(
+        /**
+         * @var string column name
+         */
         private string $column,
+        /**
+         * @var bool
+         */
         private bool $ascending,
     ) {
     }

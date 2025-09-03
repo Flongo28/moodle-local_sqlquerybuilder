@@ -16,10 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
-
 use local_sqlquerybuilder\joins\join_expression;
 use local_sqlquerybuilder\joins\join_types;
-use local_sqlquerybuilder\query;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -49,26 +47,26 @@ trait join {
      * @return array Parsed conditions with logic operators
      */
     private function parse_conditions($conditions) {
-        // Handle single condition
+        // Handle single condition.
         if (!is_array($conditions) || (count($conditions) == 3 && !is_array($conditions[0]))) {
             return [['condition' => $conditions, 'logic' => null]];
         }
-        
+
         $parsed = [];
-        $currentLogic = null;
-        
+        $currentlogic = null;
+
         foreach ($conditions as $item) {
             if (is_string($item) && (strtoupper($item) === 'AND' || strtoupper($item) === 'OR')) {
-                // This is a logic operator
-                $currentLogic = strtoupper($item);
+                // This is a logic operator.
+                $currentlogic = strtoupper($item);
             } else if (is_array($item) && count($item) >= 3) {
-                // This is a condition
-                $parsed[] = ['condition' => $item, 'logic' => $currentLogic];
-                $currentLogic = 'AND'; // Default for next condition if not specified
+                // This is a condition.
+                $parsed[] = ['condition' => $item, 'logic' => $currentlogic];
+                $currentlogic = 'AND'; // Default for next condition if not specified.
             }
         }
-        
-        // If no parsed conditions, try the old format (array of arrays, all AND)
+
+        // If no parsed conditions, try the old format (array of arrays, all AND).
         if (empty($parsed)) {
             foreach ($conditions as $condition) {
                 if (is_array($condition) && count($condition) >= 3) {
@@ -76,7 +74,7 @@ trait join {
                 }
             }
         }
-        
+
         return $parsed;
     }
 
@@ -197,40 +195,40 @@ trait join {
             return '';
         }
         $joinclause = '';
-        
+
         foreach ($this->joins as $join) {
             $table = $join[0];
-            $parsedConditions = $join[1];
+            $parsedconditions = $join[1];
             $jointype = $join[2];
             $alias = $join[3];
-            
-            // Build the table/subquery part
+
+            // Build the table/subquery part.
             if ($table instanceof query) {
                 $joinclause .= $jointype->value . ' JOIN (' . $table->to_sql() . ') ' . $alias . ' ON ';
             } else {
                 $joinclause .= $jointype->value . ' JOIN {' . $table . '} ' . $alias . ' ON ';
             }
-            
-            // Build the conditions part with proper AND/OR logic
-            $conditionParts = [];
-            foreach ($parsedConditions as $parsedCondition) {
-                $condition = $parsedCondition['condition'];
-                $logic = $parsedCondition['logic'];
-                
+
+            // Build the conditions part with proper AND/OR logic.
+            $conditionparts = [];
+            foreach ($parsedconditions as $parsedcondition) {
+                $condition = $parsedcondition['condition'];
+                $logic = $parsedcondition['logic'];
+
                 if (is_array($condition) && count($condition) >= 3) {
-                    $conditionStr = $condition[0] . ' ' . $condition[1] . ' ' . $condition[2];
-                    
-                    if ($logic && !empty($conditionParts)) {
-                        $conditionParts[] = $logic . ' ' . $conditionStr;
+                    $conditionstr = $condition[0] . ' ' . $condition[1] . ' ' . $condition[2];
+
+                    if ($logic && !empty($conditionparts)) {
+                        $conditionparts[] = $logic . ' ' . $conditionstr;
                     } else {
-                        $conditionParts[] = $conditionStr;
+                        $conditionparts[] = $conditionstr;
                     }
                 }
             }
-            
-            $joinclause .= implode(' ', $conditionParts) . ' ';
+
+            $joinclause .= implode(' ', $conditionparts) . ' ';
         }
-        
+
         return preg_replace('/\s{2,}/', ' ', trim($joinclause));
     }
 }
