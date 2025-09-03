@@ -24,19 +24,29 @@ use local_sqlquerybuilder\columns\column;
  *
  * @package     local_sqlquerybuilder
  * @category    test
- * @covers      \local_sqlquerybuilder\query
  * @copyright   2025 Daniel Meißner
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sqlgeneration_test extends \advanced_testcase {
+    public function test_order_by() {
+        $expected = "SELECT * FROM {users} WHERE deleted = 0 ORDER BY email DESC, timecreated ASC";
+
+        $actual = db::table('users')
+            ->where('deleted', '=', 0)
+            ->order_desc('email')
+            ->order_asc('timecreated')
+            ->to_sql();
+
+        $this->assertEquals($expected, $actual);
+    }
+
     /**
      * Test custom query from
      *
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1),
-                      (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
+        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1), (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
 
         $subquerya = db::table('users')
             ->where('id', '=', 1);

@@ -16,6 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
+use local_sqlquerybuilder\orderings\ordering;
+
 /**
  * Trait that builds a sql statement, that can be exported via
  * export_orderby()
@@ -24,9 +26,70 @@ namespace local_sqlquerybuilder;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait orderby {
-    public function order_by(string $sortby, bool $ascending = false) {
+    protected $orderings = [];
+
+    /**
+     * Orders the query by the columns (ascending order)
+     *
+     * The first sort order
+     *
+     * @param string ...$columns
+     * @return static Itself
+     */
+    public function order_asc(string ...$columns): static {
+        foreach ($columns as $column) {
+            $this->orderings[] = new ordering(
+                $column,
+                true
+            );
+        }
+
+        return $this;
     }
 
+    /**
+     * Orders the query by the columns (descending order)
+     *
+     * The first sort order
+     *
+     * @param string ...$columns
+     * @return static Itself
+     */
+    public function order_desc(string ...$columns): static {
+        foreach ($columns as $column) {
+            $this->orderings[] = new ordering(
+                $column,
+                false
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Deletes all orders
+     *
+     * @return static Itself
+     */
+    public function clear_order(): static {
+        $this->orderings = [];
+        return $this;
+    }
+
+    /**
+     * Exports the “order by” part as sql
+     *
+     * Is an empty string if no columns are set
+     *
+     * @return string
+     */
     protected function export_orderby(): string {
+        if (empty($this->orderings)) {
+            return '';
+        }
+
+        $formattedorderings = array_map(fn (ordering $order) => $order->export(), $this->orderings);
+
+        return "ORDER BY " . implode(', ', $formattedorderings);
     }
 }

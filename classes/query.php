@@ -28,7 +28,7 @@ use stdClass;
  */
 
 class query {
-    use select, where, join, grouping;
+    use select, where, join, orderby, grouping;
 
     /**
      * @param from_expression $from table which concerns the query
@@ -45,7 +45,8 @@ class query {
             . "FROM " . $this->from->export(true)
             . $this->export_join()
             . $this->export_where()
-            . $this->export_grouping();
+            . $this->export_grouping()
+            . $this->export_orderby();
 
         return trim($sql);
     }
@@ -55,24 +56,9 @@ class query {
         return $DB->get_records_sql($this->to_sql());
     }
 
-    public function first(): ?\stdClass {
+    public function first(): ?stdClass {
         global $DB;
-
-        if (empty($this->wheres)) {
-            $record = $DB->get_record($this->from->export(), [], '*', IGNORE_MULTIPLE);
-        } else {
-            // Only supports simple '=' and '<>' for now.
-            [$field, $operator, $value] = $this->wheres[0];
-            if ($operator === '=') {
-                $record = $DB->get_record($this->from->export(), [$field => $value], '*', IGNORE_MULTIPLE);
-            } else if ($operator === '<>') {
-                $records = $DB->get_records_select($this->from->export(), "{$field} <> :val", ['val' => $value], 'id ASC', '*', 0, 1);
-                $record = reset($records) ?: false;
-            } else {
-                throw new \coding_exception("Operator $operator not supported in first()");
-            }
-        }
-
+        $record = $DB->get_record_sql($this->to_sql(), strictness: IGNORE_MULTIPLE);
         return $record === false ? null : $record;
     }
 
