@@ -90,7 +90,7 @@ trait where {
      */
 
      ### TODO column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] , dann gibt es keinen direkt operator/value
-     public function notwhere($column, $operator, $value) {
+     public function wherenot($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
             'column' => $column,
@@ -217,7 +217,7 @@ trait where {
             }
             $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $value . ' ';
         }
-        return $whereclause;
+        return preg_replace('/\s{2,}/', ' ', $whereclause);
     }
 
 }
