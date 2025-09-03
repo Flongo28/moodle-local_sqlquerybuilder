@@ -17,15 +17,25 @@
 namespace local_sqlquerybuilder\columns;
 
 /**
- * Types of aggregations in sql
+ * Types of aggregations in SQL.
  *
- * @copyright   Konrad Ebel
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_sqlquerybuilder
+ * @copyright  Konrad Ebel
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 enum aggregation: string {
+    // Maximum value.
     case MAX = 'MAX';
+
+    // Minimum value.
     case MIN = 'MIN';
+
+    // Average value.
     case AVG = 'AVG';
+
+    // Sum of values.
     case SUM = 'SUM';
+
+    // Count of values.
     case COUNT = 'COUNT';
 }
