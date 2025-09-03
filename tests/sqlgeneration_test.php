@@ -24,12 +24,19 @@ use local_sqlquerybuilder\columns\column;
  *
  * @package     local_sqlquerybuilder
  * @category    test
+ * @covers      \local_sqlquerybuilder\query
  * @copyright   2025 Daniel Meißner
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sqlgeneration_test extends \advanced_testcase {
-    public function test_custom_query_from() {
-        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1), (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
+    /**
+     * Test custom query from
+     *
+     * @return void
+     */
+    public function test_custom_query_from(): void {
+        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1),
+                      (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
 
         $subquerya = db::table('users')
             ->where('id', '=', 1);
@@ -44,8 +51,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if everything get selected if no calls where made
+     *
+     * @return void
      */
-    public function test_no_select() {
+    public function test_no_select(): void {
         $expected = "SELECT * FROM {user}";
 
         $actual = db::table('user')
@@ -56,8 +65,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if selecting a count is possible
+     *
+     * @return void
      */
-    public function test_count() {
+    public function test_count(): void {
         $expected = "SELECT COUNT(1) FROM {user}";
 
         $actual = db::table('user')
@@ -69,8 +80,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if selecting a sum is possible
+     *
+     * @return void
      */
-    public function test_sum() {
+    public function test_sum(): void {
         $expected = "SELECT SUM(suspended) AS count_suspended FROM {user}";
 
         $actual = db::table('user')
@@ -82,8 +95,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if selecting a maximum is possible
+     *
+     * @return void
      */
-    public function test_maximum() {
+    public function test_maximum(): void {
         $expected = "SELECT MAX(timecreated) AS lastcreated FROM {user}";
 
         $actual = db::table('user')
@@ -95,8 +110,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if selecting a minimum is possible
+     *
+     * @return void
      */
-    public function test_minimum() {
+    public function test_minimum(): void {
         $expected = "SELECT MIN(timecreated) AS firstcreated FROM {user}";
 
         $actual = db::table('user')
@@ -108,8 +125,10 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if multiple selects are possible
+     *
+     * @return void
      */
-    public function test_multiple_selects() {
+    public function test_multiple_selects(): void {
         $expected = "SELECT (username) AS uname, (email) AS mail, (deleted) AS d FROM {user}";
 
         $actual = db::table('user')
@@ -123,6 +142,8 @@ final class sqlgeneration_test extends \advanced_testcase {
 
     /**
      * Tests if the alias in selects is working
+     *
+     * @return void
      */
     public function test_alias(): void {
         $expected = "SELECT (username) AS uname FROM {user}";
@@ -134,6 +155,11 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test a simple query
+     *
+     * @return void
+     */
     public function test_a_simple_query(): void {
         $expected = "SELECT username FROM {user} WHERE suspended = 1";
 
@@ -145,6 +171,11 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test simple query with alias from
+     *
+     * @return void
+     */
     public function test_a_simple_query_with_from_alias(): void {
         $expected = "SELECT username FROM {user} u WHERE suspended = 1";
 
@@ -156,6 +187,11 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test string in where clause is quoted
+     *
+     * @return void
+     */
     public function test_that_a_string_in_a_where_clause_is_quoted(): void {
         $expected = "SELECT username FROM {user} WHERE username = 'Paul'";
 
@@ -167,6 +203,11 @@ final class sqlgeneration_test extends \advanced_testcase {
         $this->assertEquals($expected, $actual);
     }
 
+    /**
+     * Test query with joins
+     *
+     * @return void
+     */
     public function test_a_query_with_joins(): void {
         $expected = "SELECT * FROM {user} "
             . "JOIN {user_enrolments} ON user_enrolments.id = user.id";

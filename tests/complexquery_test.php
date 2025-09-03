@@ -24,6 +24,7 @@ use core\di;
  *
  * @package     local_sqlquerybuilder
  * @category    test
+ * @covers      \local_sqlquerybuilder\query
  * @copyright   2025 Matthias Opitz <m.opitz@ucl.ac.uk>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -69,7 +70,7 @@ final class complexquery_test extends \advanced_testcase {
         $actual = db::table('enrol', 'e')
             ->distinct()
             ->join('user_enrolments', 'ue.enrolid', '=', 'e.id', 'ue')
-            ->join('user','u.id', '=', 'ue.userid', 'u')
+            ->join('user', 'u.id', '=', 'ue.userid', 'u')
             ->select('ue.userid')
             ->where('ue.status', '=', 0)
             ->where('u.deleted', '=', 0)
