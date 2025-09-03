@@ -19,6 +19,7 @@ namespace local_sqlquerybuilder;
 
 use local_sqlquerybuilder\joins\join_expression;
 use local_sqlquerybuilder\joins\join_types;
+use local_sqlquerybuilder\query;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -51,6 +52,21 @@ trait join {
         $this->joins[] = [$table, $first, $operator, $second, join_types::FULL, $alias];
         return $this;
     }
+
+    public function joinSub(query $query, $first, $operator, $second, $alias) {
+        $this->joins[] = [$query, $first, $operator, $second, join_types::INNER, $alias];
+        return $this;
+    }
+
+    public function leftJoinSub(query $query, $first, $operator, $second, $alias) {
+        $this->joins[] = [$query, $first, $operator, $second, join_types::LEFT, $alias];
+        return $this;
+    }
+
+    public function rightJoinSub(query $query, $first, $operator, $second, $alias) {
+        $this->joins[] = [$query, $first, $operator, $second, join_types::RIGHT, $alias];
+        return $this;
+    }
 /*     public function crossjoin($table, $first, $operator, $second, $alias = '') {
         $this->joins[] = [$table, $first, $operator, $second, join_types::CROSS, $alias];
         return $this;
@@ -61,7 +77,11 @@ trait join {
         }
         $joinclause = '';
         foreach ($this->joins as $join) {
-            $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . 'ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+            if ($join[0] instanceof query) {
+                $joinclause .= $join[4]->value . ' JOIN (' . $join[0]->to_sql() . ') ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+            } else {
+                $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . ' ON ' . $join[1] . ' ' . $join[2] . ' ' . $join[3] . ' ';
+            }
         }
         return $joinclause;
     }
