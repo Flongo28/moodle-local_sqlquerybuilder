@@ -43,123 +43,147 @@ trait join {
     }
 
     /**
-     * join
+     * Parse conditions array to support AND/OR logic
+     *
+     * @param mixed $conditions
+     * @return array Parsed conditions with logic operators
+     */
+    private function parse_conditions($conditions) {
+        // Handle single condition
+        if (!is_array($conditions) || (count($conditions) == 3 && !is_array($conditions[0]))) {
+            return [['condition' => $conditions, 'logic' => null]];
+        }
+        
+        $parsed = [];
+        $currentLogic = null;
+        
+        foreach ($conditions as $item) {
+            if (is_string($item) && (strtoupper($item) === 'AND' || strtoupper($item) === 'OR')) {
+                // This is a logic operator
+                $currentLogic = strtoupper($item);
+            } else if (is_array($item) && count($item) >= 3) {
+                // This is a condition
+                $parsed[] = ['condition' => $item, 'logic' => $currentLogic];
+                $currentLogic = 'AND'; // Default for next condition if not specified
+            }
+        }
+        
+        // If no parsed conditions, try the old format (array of arrays, all AND)
+        if (empty($parsed)) {
+            foreach ($conditions as $condition) {
+                if (is_array($condition) && count($condition) >= 3) {
+                    $parsed[] = ['condition' => $condition, 'logic' => count($parsed) === 0 ? null : 'AND'];
+                }
+            }
+        }
+        
+        return $parsed;
+    }
+
+    /**
+     * join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param string $table
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions
+     *                         Format: [['first', 'op', 'second'], 'AND', ['first2', 'op2', 'second2'], 'OR', ...]
+     *                         OR: [['first', 'op', 'second']] (defaults to AND between multiple conditions)
      * @param string $alias
      * @return $this
      */
-    public function join(string $table, string $first, string $operator, string $second , string $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_types::INNER, $alias];
+    public function join(string $table, $conditions, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::INNER, $alias];
         return $this;
     }
 
     /**
-     * left join
+     * left join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param string $table
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function leftjoin(string $table, string $first, string $operator, string $second , string $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_types::LEFT, $alias];
+    public function leftjoin(string $table, $conditions, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::LEFT, $alias];
         return $this;
     }
 
     /**
-     * right join
+     * right join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param string $table
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function rightjoin(string $table, string $first, string $operator, string $second , string $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_types::RIGHT, $alias];
+    public function rightjoin(string $table, $conditions, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::RIGHT, $alias];
         return $this;
     }
 
     /**
-     * full join
+     * full join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param string $table
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function fulljoin(string $table, string $first, string $operator, string $second , string $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_types::FULL, $alias];
+    public function fulljoin(string $table, $conditions, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::FULL, $alias];
         return $this;
     }
 
     /**
-     * sub join
+     * sub join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param \local_sqlquerybuilder\query $query
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function joinsub(query $query, string $first, string $operator, string $second, string $alias) {
-        $this->joins[] = [$query, $first, $operator, $second, join_types::INNER, $alias];
+    public function joinsub(query $query, $conditions, string $alias) {
+        $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::INNER, $alias];
         return $this;
     }
 
     /**
-     * sub left join
+     * sub left join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param \local_sqlquerybuilder\query $query
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function leftjoinsub(query $query, string $first, string $operator, string $second, string $alias) {
-        $this->joins[] = [$query, $first, $operator, $second, join_types::LEFT, $alias];
+    public function leftjoinsub(query $query, $conditions, string $alias) {
+        $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::LEFT, $alias];
         return $this;
     }
 
     /**
-     * sub right join
+     * sub right join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param \local_sqlquerybuilder\query $query
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function rightjoinsub(query $query, string $first, string $operator, string $second, string $alias) {
-        $this->joins[] = [$query, $first, $operator, $second, join_types::RIGHT, $alias];
+    public function rightjoinsub(query $query, $conditions, string $alias) {
+        $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::RIGHT, $alias];
         return $this;
     }
 
     // Todo: preliminary function - do not use.
     /**
-     * cross join
+     * cross join - supports both single condition and array of conditions with AND/OR logic
      *
      * @param string $table
-     * @param string $first
-     * @param string $operator
-     * @param string $second
+     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function crossjoin(string $table, string $first, string $operator, string $second, string $alias = '') {
-        $this->joins[] = [$table, $first, $operator, $second, join_types::CROSS, $alias];
+    public function crossjoin(string $table, $conditions, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::CROSS, $alias];
         return $this;
     }
 
@@ -173,15 +197,40 @@ trait join {
             return '';
         }
         $joinclause = '';
+        
         foreach ($this->joins as $join) {
-            if ($join[0] instanceof query) {
-                $joinclause .= $join[4]->value . ' JOIN (' . $join[0]->to_sql() . ') ' . $join[5] . ' ON ' . $join[1] .
-                    ' ' . $join[2] . ' ' . $join[3] . ' ';
+            $table = $join[0];
+            $parsedConditions = $join[1];
+            $jointype = $join[2];
+            $alias = $join[3];
+            
+            // Build the table/subquery part
+            if ($table instanceof query) {
+                $joinclause .= $jointype->value . ' JOIN (' . $table->to_sql() . ') ' . $alias . ' ON ';
             } else {
-                $joinclause .= $join[4]->value . ' JOIN {' . $join[0] . '} ' . $join[5] . ' ON ' . $join[1] .
-                    ' ' . $join[2] . ' ' . $join[3] . ' ';
+                $joinclause .= $jointype->value . ' JOIN {' . $table . '} ' . $alias . ' ON ';
             }
+            
+            // Build the conditions part with proper AND/OR logic
+            $conditionParts = [];
+            foreach ($parsedConditions as $parsedCondition) {
+                $condition = $parsedCondition['condition'];
+                $logic = $parsedCondition['logic'];
+                
+                if (is_array($condition) && count($condition) >= 3) {
+                    $conditionStr = $condition[0] . ' ' . $condition[1] . ' ' . $condition[2];
+                    
+                    if ($logic && !empty($conditionParts)) {
+                        $conditionParts[] = $logic . ' ' . $conditionStr;
+                    } else {
+                        $conditionParts[] = $conditionStr;
+                    }
+                }
+            }
+            
+            $joinclause .= implode(' ', $conditionParts) . ' ';
         }
-        return preg_replace('/\s{2,}/', ' ', $joinclause);
+        
+        return preg_replace('/\s{2,}/', ' ', trim($joinclause));
     }
 }
