@@ -114,7 +114,7 @@ final class querybuilder_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         $result = db::table('user')->find(999999);
-        $this->assertFalse($result, 'Should return null when record not found');
+        $this->assertNull($result, 'Should return null when record not found');
     }
 
     public function test_where_clause_get(): void {

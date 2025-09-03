@@ -84,10 +84,10 @@ class query {
      * Returns the entry searched id
      *
      * @param int $id Search ID
-     * @return stdClass|bool An entry if found one
+     * @return stdClass|null An entry if found one
      * @throws dml_exception Database is not reachable
      */
-    public function find(int $id): stdClass|bool {
+    public function find(int $id): ?stdClass {
         $this->where('id', '=', $id);
         return $this->first();
     }
