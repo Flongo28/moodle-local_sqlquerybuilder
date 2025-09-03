@@ -1,8 +1,40 @@
 # SQL Query Builder #
+Enables other plugins to build queries with a builder class.
 
-TO-DO Describe the plugin shortly here.
+This plugin is a library used for other plugins. It allows developers
+to create queries in a flexible, safe and easy way. 
 
-TO-DO Provide more detailed description here.
+> ⚠️ **SQL Injections**. <br>
+> This plugin currently does not perform parameter binding or input validation.  
+**Do not use untrusted user input** in queries. It is planned to fix this in future versions.
+
+> Work in Progress!
+
+## Usage
+The idea is to use the db class to create a query, as demonstrated in this simple example:
+```
+$paul = db::table('user')->where('firstname', '=', 'Paul')
+                         ->get();
+```
+
+## Advantages
+- compatible
+  - simplifies writing of cross-database queries
+- readable
+  - get rid of SQL in PHP
+- productive
+  - build queries faster
+- flexible
+  - adapt similar queries for different use-cases
+
+## TODOS
+- Collect parameters to sanitize them
+- Provide LIMIT and OFFSET
+- Allow parameters in select
+- Provide more raw methods to make the plugin more flexible
+- Update functionality
+- Delete functionality
+- Create functionality
 
 ## Installing via uploaded ZIP file ##
 
@@ -16,7 +48,7 @@ TO-DO Provide more detailed description here.
 
 The plugin can be also installed by putting the contents of this directory to
 
-    {your/moodle/dirroot}/local/sql_query_builder
+    {your/moodle/dirroot}/local/sqlquerybuilder
 
 Afterwards, log in to your Moodle site as an admin and go to _Site administration >
 Notifications_ to complete the installation.
@@ -28,8 +60,12 @@ Alternatively, you can run
 to complete the installation from the command line.
 
 ## License ##
-
-2025 Your Name <you@example.com>
+This plugin was developed at the Moodle Moot Dach 2025. It is the result of a collaboration between:
+- 2025 Dennis Phahl
+- 2025 Matthias Opitz
+- 2025 Daniel Meißner
+- 2025 Mahmoud Chehada
+- 2025 Konrad Ebel <konrad.ebel@oncampus.de>
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
