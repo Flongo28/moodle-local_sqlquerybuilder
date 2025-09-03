@@ -54,7 +54,7 @@ class query {
             . $this->export_grouping()
             . $this->export_orderby();
 
-        return trim($sql);
+        return trim(preg_replace('/\s{2,}/', ' ', $sql));
     }
 
     /**
