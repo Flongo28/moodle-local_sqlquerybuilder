@@ -255,7 +255,7 @@ final class sqlgeneration_test extends \advanced_testcase {
             . "JOIN {user_enrolments} ON user_enrolments.id = user.id";
 
         $actual = db::table('user')
-            ->join('user_enrolments', 'user_enrolments.id', '=', 'user.id')
+            ->join('user_enrolments', ['user_enrolments.id', '=', 'user.id'])
             ->to_sql();
 
         $this->assertEquals($expected, $actual);
