@@ -16,6 +16,7 @@
 
 namespace local_sqlquerybuilder;
 
+use dml_exception;
 use local_sqlquerybuilder\froms\from_expression;
 use stdClass;
 
@@ -26,11 +27,16 @@ use stdClass;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class query {
-    use select, where, join, orderby, grouping;
+    use select;
+    use where;
+    use join;
+    use orderby;
+    use grouping;
 
     /**
+     * Constructor
+     *
      * @param from_expression $from table which concerns the query
      */
     public function __construct(public from_expression $from) {
@@ -51,20 +57,39 @@ class query {
         return trim($sql);
     }
 
+    /**
+     * Get multiple entries from the query
+     *
+     * @return stdClass[] Entries from the database call
+     * @throws dml_exception Database is not reachable
+     */
     public function get(): array {
         global $DB;
         return $DB->get_records_sql($this->to_sql());
     }
 
+    /**
+     * Get the first entry from the query
+     *
+     * @return stdClass|null An entry if found one
+     * @throws dml_exception Database is not reachable
+     */
     public function first(): ?stdClass {
         global $DB;
         $record = $DB->get_record_sql($this->to_sql(), strictness: IGNORE_MULTIPLE);
         return $record === false ? null : $record;
     }
 
+    /**
+     * Returns the entry searched id
+     *
+     * @param int $id Search ID
+     * @return stdClass|bool An entry if found one
+     * @throws dml_exception Database is not reachable
+     */
     public function find(int $id): stdClass|bool {
-        global $DB;
-        return $DB->get_record($this->from->export(), ['id' => $id]);
+        $this->where('id', '=', $id);
+        return $this->first();
     }
 
     /**
