@@ -61,6 +61,26 @@ trait where {
     }
 
     /**
+     * Add a WHERE condition with AND logic.
+     *
+     * @param string $column The column name
+     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
+     * @param mixed $value The value to compare against
+     * @return $this For method chaining
+     */
+    public function wherecolumn($column, $operator, $value) {
+        $this->whereconditions[] = [
+            'type' => 'AND',
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'negation' => false,
+            'columnarray' => true,
+        ];
+        return $this;
+    }
+
+    /**
      * Add a WHERE condition with OR logic.
      *
      * @param string $column The column name
@@ -172,6 +192,7 @@ trait where {
             'value' => '',
             'negation' => false,
         ];
+        return $this;
     }
 
     /**
@@ -188,6 +209,7 @@ trait where {
             'value' => '',
             'negation' => false,
         ];
+        return $this;
     }
     /**
      * Export the WHERE clause as a SQL string.
@@ -201,7 +223,7 @@ trait where {
             return '';
         }
         foreach ($this->whereconditions as $condition) {
-            if (!empty($condition['value']) && is_string($condition['value'])) {
+            if (!empty($condition['value']) && is_string($condition['value']) && !isset($condition['columnarray'])) {
                 $value = "'" . $condition['value'] . "'";
             } else {
                 $value = $condition['value'];
