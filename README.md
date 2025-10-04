@@ -27,7 +27,6 @@ $paul = db::table('user')->where('firstname', '=', 'Paul')
   - adapt similar queries for different use-cases
 
 ## TODOS
-- Collect parameters to sanitize them
 - Provide LIMIT and OFFSET
 - Allow parameters in select
 - Provide more raw methods to make the plugin more flexible

@@ -26,6 +26,10 @@ namespace local_sqlquerybuilder\query;
 
 use core\clock;
 use core\di;
+use local_sqlquerybuilder\query\where\where_expression;
+use local_sqlquerybuilder\query\where\where_comparison;
+use local_sqlquerybuilder\query\where\or_where_group;
+use local_sqlquerybuilder\query\where\where_is_null;
 
 /**
  * Trait for handling WHERE conditions in SQL queries.
@@ -34,17 +38,9 @@ use core\di;
  */
 class wherepart implements expression {
 
-    /**
-     * Array to store WHERE conditions.
-     *
-     * @var array
-     */
-    protected $whereconditions = [];
+    /** @var where_expression[] All where expressions */
+    protected array $whereconditions = [];
 
-    protected $params = [];
-
-    // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
-    // dann gibt es keinen direkt operator/value.
     /**
      * Add a WHERE condition with AND logic.
      *
@@ -52,15 +48,8 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function where($column, $operator, $value) {
-        $this->whereconditions[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => '?',
-            'negation' => false,
-        ];
-        $this->params[] = $value;
+    public function where($column, $operator, $value, $negate = false) {
+        $this->whereconditions[] = new where_comparison($column, $operator, $value, $negate);
     }
 
     /**
@@ -68,18 +57,10 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
-     * @param mixed $value The value to compare against
+     * @param mixed $othercolumn The column to compare against
      */
-    public function wherecolumn($column, $operator, $value) {
-        $this->whereconditions[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => '?',
-            'negation' => false,
-            'columnarray' => true,
-        ];
-        $this->params[] = $value;
+    public function wherecolumn($column, $operator, $othercolumn, $negate = false) {
+        $this->whereconditions[] = new where_comparison($column, $operator, $othercolumn, $negate);
     }
 
     /**
@@ -89,15 +70,9 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function orwhere($column, $operator, $value) {
-        $this->whereconditions[] = [
-            'type' => 'OR',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => '?',
-            'negation' => false,
-        ];
-        $this->params[] = $value;
+    public function orwhere($column, $operator, $value, $negate = false) {
+        $whereclause = new where_comparison($column, $operator, $value, $negate);
+        $this->add_or_statement($whereclause);
     }
 
     // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
@@ -110,14 +85,7 @@ class wherepart implements expression {
      * @param mixed $value The value to compare against
      */
     public function wherenot($column, $operator, $value) {
-        $this->whereconditions[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => '?',
-            'negation' => true,
-        ];
-        $this->params[] = $value;
+        $this->where($column, $operator, $value, true);
     }
 
     /**
@@ -128,14 +96,7 @@ class wherepart implements expression {
      * @param mixed $value The value to compare against
      */
     public function orwherenot($column, $operator, $value) {
-        $this->whereconditions[] = [
-            'type' => 'OR',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => '?',
-            'negation' => true,
-        ];
-        $this->params[] = $value;
+        $this->orwhere($column, $operator, $value, true);
     }
 
     /**
@@ -144,13 +105,7 @@ class wherepart implements expression {
      * @param string $column The column name
      */
     public function wherenull($column) {
-        $this->whereconditions[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => 'IS NULL',
-            'value' => '',
-            'negation' => false,
-        ];
+        $this->whereconditions[] = new where_is_null($column);
     }
 
     /**
@@ -158,14 +113,9 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function orwherenull($column) {
-        $this->whereconditions[] = [
-            'type' => 'OR',
-            'column' => $column,
-            'operator' => 'IS NULL',
-            'value' => '',
-            'negation' => false,
-        ];
+    public function or_where_null($column) {
+        $isnullstatement = new where_is_null($column);
+        $this->add_or_statement($isnullstatement);
     }
 
     /**
@@ -173,14 +123,8 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function wherenotnull($column) {
-        $this->whereconditions[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => 'IS NOT NULL',
-            'value' => '',
-            'negation' => false,
-        ];
+    public function where_notnull($column) {
+        $this->whereconditions[] = new where_is_null($column, true);
     }
 
     /**
@@ -188,14 +132,23 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function orwherenotnull($column) {
-        $this->whereconditions[] = [
-            'type' => 'OR',
-            'column' => $column,
-            'operator' => 'IS NOT NULL',
-            'value' => '',
-            'negation' => false,
-        ];
+    public function or_where_notnull($column) {
+        $notnullstatement = new where_is_null($column, true);
+        $this->add_or_statement($notnullstatement);
+    }
+
+    private function add_or_statement(where_expression $expression): void {
+        $endindex = count($this->whereconditions) -1;
+        $lastclause = $this->whereconditions[$endindex];
+
+        if ($lastclause instanceof or_where_group) {
+            $lastclause->add_clauses($expression);
+        } else {
+            $this->whereconditions[$endindex] = new or_where_group(
+                $lastclause,
+                $expression,
+            );
+        }
     }
 
     /**
@@ -226,26 +179,19 @@ class wherepart implements expression {
     public function get_sql(): string {
         $whereclause = ' WHERE ';
         $firstiteration = true;
+
         if (empty($this->whereconditions)) {
             return '';
         }
-        foreach ($this->whereconditions as $condition) {
-            $value = $condition['value'];
 
-            if (!$firstiteration) {
-                $whereclause .= $condition['type'] . ' ';
-            } else {
-                $firstiteration = false;
-            }
-            if ($condition['negation']) {
-                $whereclause .= 'NOT ';
-            }
-            $whereclause .= $condition['column'] . ' ' . $condition['operator'] . ' ' . $value . ' ';
-        }
+        $whereclause .= implode(' AND ', $this->whereconditions);
+        $whereclause .= ' ';
+
         return preg_replace('/\s{2,}/', ' ', $whereclause);
     }
 
     public function get_params(): array {
-        return $this->params;
+        $params = array_map(fn (where_expression $expression) => $expression->get_params(), $this->whereconditions);
+        return array_merge(...$params);
     }
 }
