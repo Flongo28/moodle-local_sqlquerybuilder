@@ -37,15 +37,16 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_order_by(): void {
-        $expected = "SELECT * FROM {users} WHERE deleted = 0 ORDER BY email DESC, timecreated ASC";
+        $expected = "SELECT * FROM {users} WHERE deleted = ? ORDER BY email DESC, timecreated ASC";
+        $expectedparams = [0];
 
         $actual = db::table('users')
             ->where('deleted', '=', 0)
             ->order_desc('email')
-            ->order_asc('timecreated')
-            ->get_sql();
+            ->order_asc('timecreated');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -54,17 +55,21 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = 1), (SELECT * FROM {entries} WHERE id = 2), ("Tryit")))';
+        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), ("Tryit")))';
+        $expectedparams = [1, 2]; 
 
         $subquerya = db::table('users')
             ->where('id', '=', 1);
         $subqueryb = db::table('entries')
             ->where('id', '=', 2);
 
-        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']])->get_sql();
-        $actual = str_replace("\n", '', $actual);
+        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']]);
 
-        $this->assertEquals($expected, $actual);
+        $sql = $actual->get_sql();
+        $sql = str_replace("\n", '', $sql);
+
+        $this->assertEquals($expected, $sql);
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -74,11 +79,12 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_no_select(): void {
         $expected = "SELECT * FROM {user}";
+        $expectedparams = [];
 
-        $actual = db::table('user')
-            ->get_sql();
+        $actual = db::table('user');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -88,12 +94,13 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_count(): void {
         $expected = "SELECT COUNT(1) FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->select_count()
-            ->get_sql();
+            ->select_count();
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -103,12 +110,13 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_sum(): void {
         $expected = "SELECT SUM(suspended) AS count_suspended FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->select_sum('suspended', 'count_suspended')
-            ->get_sql();
+            ->select_sum('suspended', 'count_suspended');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -118,12 +126,13 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_maximum(): void {
         $expected = "SELECT MAX(timecreated) AS lastcreated FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->select_max('timecreated', 'lastcreated')
-            ->get_sql();
+            ->select_max('timecreated', 'lastcreated');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -133,12 +142,13 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_minimum(): void {
         $expected = "SELECT MIN(timecreated) AS firstcreated FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->select_min('timecreated', 'firstcreated')
-            ->get_sql();
+            ->select_min('timecreated', 'firstcreated');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -148,14 +158,15 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_multiple_selects(): void {
         $expected = "SELECT (username) AS uname, (email) AS mail, (deleted) AS d FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
             ->select('username', 'uname')
             ->select('email', 'mail')
-            ->select('deleted', 'd')
-            ->get_sql();
+            ->select('deleted', 'd');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -165,12 +176,13 @@ final class sqlgeneration_test extends advanced_testcase {
      */
     public function test_alias(): void {
         $expected = "SELECT (username) AS uname FROM {user}";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->select('username', 'uname')
-            ->get_sql();
+            ->select('username', 'uname');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -179,14 +191,15 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_a_simple_query(): void {
-        $expected = "SELECT username FROM {user} WHERE suspended = 1";
+        $expected = "SELECT username FROM {user} WHERE suspended = ?";
+        $expectedparams = [1];
 
         $actual = db::table('user')
             ->select('username')
-            ->where('suspended', '=', 1)
-            ->get_sql();
+            ->where('suspended', '=', 1);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -195,14 +208,15 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_a_simple_query_with_from_alias(): void {
-        $expected = "SELECT username FROM {user} u WHERE suspended = 1";
+        $expected = "SELECT username FROM {user} u WHERE suspended = ?";
+        $expectedparams = [1];
 
         $actual = db::table('user', 'u')
             ->select('username')
-            ->where('suspended', '=', 1)
-            ->get_sql();
+            ->where('suspended', '=', 1);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -211,50 +225,55 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_that_a_string_in_a_where_clause_is_quoted(): void {
-        $expected = "SELECT username FROM {user} WHERE username = 'Paul'";
+        $expected = "SELECT username FROM {user} WHERE username = ?";
+        $expectedparams = ['Paul'];
 
         $actual = db::table('user')
             ->select('username')
-            ->where('username', '=', 'Paul')
-            ->get_sql();
+            ->where('username', '=', 'Paul');
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     public function test_simple_where_in_clause(): void {
         $expected = "SELECT * FROM {unknown} WHERE field IN (1, 2, 3)";
+        $expectedparams = [[1, 2, 3]];
 
         $actual = db::table('unknown')
-            ->where_in('field', [1, 2, 3])
-            ->get_sql();
+            ->where_in('field', [1, 2, 3]);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     public function test_subquery_where_in_clause(): void {
         $expected = "SELECT * FROM {unknown} WHERE field IN (SELECT id FROM {course} WHERE timestart > 1)";
+        $expectedparams = [1];
 
         $latestcourses = db::table('course')
             ->select('id')
             ->where('timestart', '>', 1);
 
         $actual = db::table('unknown')
-            ->where_in('field', $latestcourses)
-            ->get_sql();
+            ->where_in('field', $latestcourses);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     public function test_from_with_subquery(): void {
         $expected = "SELECT * FROM (SELECT username FROM {user} u WHERE u.id = 3)";
+        $expectedparams = [3];
 
         $subquery = db::table('user', 'u')
             ->select('username')
             ->where('u.id', '=', 3);
 
-        $actual = db::table($subquery)->get_sql();
+        $actual = db::table($subquery);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 
     /**
@@ -265,11 +284,12 @@ final class sqlgeneration_test extends advanced_testcase {
     public function test_a_query_with_joins(): void {
         $expected = "SELECT * FROM {user} "
             . "JOIN {user_enrolments} ON user_enrolments.id = user.id";
+        $expectedparams = [];
 
         $actual = db::table('user')
-            ->join('user_enrolments', ['user_enrolments.id', '=', 'user.id'])
-            ->get_sql();
+            ->join('user_enrolments', ['user_enrolments.id', '=', 'user.id']);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
     }
 }

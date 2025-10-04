@@ -20,6 +20,7 @@ use BadMethodCallException;
 use dml_exception;
 use local_sqlquerybuilder\query\froms\from_expression;
 use stdClass;
+use moodle_database;
 
 /**
  * A Query builder
@@ -31,9 +32,10 @@ use stdClass;
 class query implements expression {
     private select $selectpart;
     private join $joinpart;
-    private where $wherepart;
+    private wherepart $wherepart;
     private grouping $groupingpart;
     private orderby $orderbypart;
+    private moodle_database $database;
 
     /**
      * Constructor
@@ -45,7 +47,7 @@ class query implements expression {
     ) {
         $this->selectpart = new select();
         $this->joinpart = new join();
-        $this->wherepart = new where();
+        $this->wherepart = new wherepart();
         $this->groupingpart = new grouping();
         $this->orderbypart = new orderby();
     }
@@ -83,7 +85,7 @@ class query implements expression {
      */
     public function get(): array {
         global $DB;
-        return $DB->get_records_sql($this->get_sql());
+        return $DB->get_records_sql($this->get_sql(), $this->get_params());
     }
 
     /**
@@ -94,7 +96,7 @@ class query implements expression {
      */
     public function first(): ?stdClass {
         global $DB;
-        $record = $DB->get_record_sql($this->get_sql(), strictness: IGNORE_MULTIPLE);
+        $record = $DB->get_record_sql($this->get_sql(), $this->get_params(), strictness: IGNORE_MULTIPLE);
         return $record === false ? null : $record;
     }
 
@@ -113,6 +115,7 @@ class query implements expression {
     private function get_query_parts(): array {
         return [
             $this->selectpart,
+            $this->from,
             $this->joinpart,
             $this->wherepart,
             $this->groupingpart,

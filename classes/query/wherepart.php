@@ -32,7 +32,7 @@ use core\di;
  *
  * This trait provides methods for building WHERE clauses with AND and OR conditions.
  */
-class where implements expression {
+class wherepart implements expression {
 
     /**
      * Array to store WHERE conditions.
@@ -40,6 +40,8 @@ class where implements expression {
      * @var array
      */
     protected $whereconditions = [];
+
+    protected $params = [];
 
     // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
     // dann gibt es keinen direkt operator/value.
@@ -49,18 +51,16 @@ class where implements expression {
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
-     * @return $this For method chaining
      */
     public function where($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
             'column' => $column,
             'operator' => $operator,
-            'value' => $value,
+            'value' => '?',
             'negation' => false,
         ];
-
-        return $this;
+        $this->params[] = $value;
     }
 
     /**
@@ -69,18 +69,17 @@ class where implements expression {
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
      * @param mixed $value The value to compare against
-     * @return $this For method chaining
      */
     public function wherecolumn($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
             'column' => $column,
             'operator' => $operator,
-            'value' => $value,
+            'value' => '?',
             'negation' => false,
             'columnarray' => true,
         ];
-        return $this;
+        $this->params[] = $value;
     }
 
     /**
@@ -89,18 +88,16 @@ class where implements expression {
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
-     * @return $this For method chaining
      */
     public function orwhere($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'OR',
             'column' => $column,
             'operator' => $operator,
-            'value' => $value,
+            'value' => '?',
             'negation' => false,
         ];
-
-        return $this;
+        $this->params[] = $value;
     }
 
     // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
@@ -111,18 +108,16 @@ class where implements expression {
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
-     * @return $this For method chaining
      */
     public function wherenot($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'AND',
             'column' => $column,
             'operator' => $operator,
-            'value' => $value,
+            'value' => '?',
             'negation' => true,
         ];
-
-        return $this;
+        $this->params[] = $value;
     }
 
     /**
@@ -131,25 +126,22 @@ class where implements expression {
      * @param string $column The column name
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
-     * @return $this For method chaining
      */
     public function orwherenot($column, $operator, $value) {
         $this->whereconditions[] = [
             'type' => 'OR',
             'column' => $column,
             'operator' => $operator,
-            'value' => $value,
+            'value' => '?',
             'negation' => true,
         ];
-
-        return $this;
+        $this->params[] = $value;
     }
 
     /**
      * Add a WHERE NULL condition with AND logic.
      *
      * @param string $column The column name
-     * @return $this For method chaining
      */
     public function wherenull($column) {
         $this->whereconditions[] = [
@@ -159,15 +151,12 @@ class where implements expression {
             'value' => '',
             'negation' => false,
         ];
-
-        return $this;
     }
 
     /**
      * Add a WHERE NULL condition with OR logic.
      *
      * @param string $column The column name
-     * @return $this For method chaining
      */
     public function orwherenull($column) {
         $this->whereconditions[] = [
@@ -177,15 +166,12 @@ class where implements expression {
             'value' => '',
             'negation' => false,
         ];
-
-        return $this;
     }
 
     /**
      * Add a WHERE NOT NULL condition with AND logic.
      *
      * @param string $column The column name
-     * @return $this For method chaining
      */
     public function wherenotnull($column) {
         $this->whereconditions[] = [
@@ -195,14 +181,12 @@ class where implements expression {
             'value' => '',
             'negation' => false,
         ];
-        return $this;
     }
 
     /**
      * Add a WHERE NOT NULL condition with OR logic.
      *
      * @param string $column The column name
-     * @return $this For method chaining
      */
     public function orwherenotnull($column) {
         $this->whereconditions[] = [
@@ -212,7 +196,6 @@ class where implements expression {
             'value' => '',
             'negation' => false,
         ];
-        return $this;
     }
 
     /**
@@ -223,9 +206,8 @@ class where implements expression {
      * @param string $columntimeend Column with end time
      * @param int|null $timebetween Timestamp which will be checked to be between the start and end
      *                              If null checks for the current time
-     * @return static Itself
      */
-    public function time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null): static {
+    public function time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null): void {
         if (is_null($timebetween)) {
             $timebetween = di::get(clock::class)->time();
         }
@@ -234,7 +216,6 @@ class where implements expression {
         $this->orwhere($columntimestart, '<=', $timebetween);
         $this->where($columntimeend, '=', 0);
         $this->orwhere($columntimeend, '>=', $timebetween);
-        return $this;
     }
 
     /**
@@ -249,11 +230,8 @@ class where implements expression {
             return '';
         }
         foreach ($this->whereconditions as $condition) {
-            if (!empty($condition['value']) && is_string($condition['value']) && !isset($condition['columnarray'])) {
-                $value = "'" . $condition['value'] . "'";
-            } else {
-                $value = $condition['value'];
-            }
+            $value = $condition['value'];
+
             if (!$firstiteration) {
                 $whereclause .= $condition['type'] . ' ';
             } else {
@@ -268,6 +246,6 @@ class where implements expression {
     }
 
     public function get_params(): array {
-        return [];
+        return $this->params;
     }
 }

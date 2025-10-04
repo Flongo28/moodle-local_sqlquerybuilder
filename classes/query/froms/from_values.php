@@ -85,6 +85,6 @@ class from_values implements from_expression {
             }
         }
         
-        return $params;
+        return array_merge(...$params);
     }
 }
