@@ -152,6 +152,33 @@ final class sqlgeneration_test extends advanced_testcase {
     }
 
     /**
+     * Test limit
+     *
+     * @return void
+     */
+    public function test_limit(): void {
+        $expected = "SELECT * FROM {user} LIMIT 5";
+        $expectedparams = [];
+
+        $actual = db::table('user')
+            ->limit(5);
+
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
+    }
+
+    public function test_offset(): void {
+        $expected = "SELECT * FROM {user} OFFSET 5";
+        $expectedparams = [];
+
+        $actual = db::table('user')
+            ->offset(5);
+
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
+    }
+
+    /**
      * Tests if multiple selects are possible
      *
      * @return void

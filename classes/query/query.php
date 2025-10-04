@@ -35,7 +35,7 @@ class query implements expression {
     private wherepart $wherepart;
     private grouping $groupingpart;
     private orderby $orderbypart;
-    private moodle_database $database;
+    private pagination $pagination;
 
     /**
      * Constructor
@@ -50,6 +50,7 @@ class query implements expression {
         $this->wherepart = new wherepart();
         $this->groupingpart = new grouping();
         $this->orderbypart = new orderby();
+        $this->pagination = new pagination();
     }
 
     /**
@@ -62,7 +63,8 @@ class query implements expression {
             . $this->joinpart->get_sql()
             . $this->wherepart->get_sql()
             . $this->groupingpart->get_sql()
-            . $this->orderbypart->get_sql();
+            . $this->orderbypart->get_sql()
+            . $this->pagination->get_sql();
 
         return trim(preg_replace('/\s{2,}/', ' ', $sql));
     }
@@ -120,6 +122,7 @@ class query implements expression {
             $this->wherepart,
             $this->groupingpart,
             $this->orderbypart,
+            $this->pagination,
         ];
     }
 
