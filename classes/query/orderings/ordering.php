@@ -14,20 +14,50 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\joins;
+namespace local_sqlquerybuilder\query\orderings;
+
+use local_sqlquerybuilder\query\expression;
 
 /**
- * Interface for join expressions
+ * Represents an ordering
  *
  * @package     local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface join_expression {
+class ordering implements expression {
+    /**
+     * Constructor
+     *
+     * @param string $column Expressions to order by
+     * @param bool $ascending Whether to filter ascending or descending
+     */
+    public function __construct(
+        private string $column,
+        private bool $ascending,
+        private array $params = []
+    ) {
+    }
+
     /**
      * Exports as sql
      *
-     * @return string join as sql
+     * @return string order by as sql
      */
-    public function export(): string;
+    public function get_sql(): string {
+        if ($this->ascending) {
+            return "$this->column ASC";
+        } else {
+            return "$this->column DESC";
+        }
+    }
+
+    /**
+     * Returns the used params
+     *
+     * @return array Params used in the expression
+     */
+    public function get_params(): array {
+        return $this->params;
+    }
 }

@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\froms;
+namespace local_sqlquerybuilder\query\froms;
 
-use Stringable;
+use local_sqlquerybuilder\query\query;
 
 /**
  * Data select from custom given values
@@ -29,7 +29,7 @@ class from_values implements from_expression {
     /**
      * Constructor
      *
-     * @param Stringable[][] $table Table with the structure of row[entry]
+     * @param string|query[][] $table Table with the structure of row[entry]
      * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
      * @param string $tablename Name of the table, only used if aliases are given
      */
@@ -55,7 +55,7 @@ class from_values implements from_expression {
      * @param bool $rawsql Has no changes here
      * @return string column for select as sql
      */
-    public function export(bool $rawsql = false): string {
+    public function get_sql(): string {
         $from = "VALUES(\n";
 
         foreach ($this->table as $row) {
@@ -72,5 +72,19 @@ class from_values implements from_expression {
         }
 
         return $from;
+    }
+
+    public function get_params(): array {
+        $params = [];
+
+        foreach ($this->table as $row) {
+            foreach ($row as $colval) {
+                if ($colval instanceof query) {
+                    $params[] = $colval->get_params();
+                }
+            }
+        }
+        
+        return $params;
     }
 }

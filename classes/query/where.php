@@ -22,7 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
 use core\clock;
 use core\di;
@@ -32,7 +32,7 @@ use core\di;
  *
  * This trait provides methods for building WHERE clauses with AND and OR conditions.
  */
-trait where {
+class where implements expression {
 
     /**
      * Array to store WHERE conditions.
@@ -242,7 +242,7 @@ trait where {
      *
      * @return string The complete WHERE clause SQL string
      */
-    protected function export_where() {
+    public function get_sql(): string {
         $whereclause = ' WHERE ';
         $firstiteration = true;
         if (empty($this->whereconditions)) {
@@ -267,4 +267,7 @@ trait where {
         return preg_replace('/\s{2,}/', ' ', $whereclause);
     }
 
+    public function get_params(): array {
+        return [];
+    }
 }

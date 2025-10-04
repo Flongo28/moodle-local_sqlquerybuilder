@@ -16,6 +16,7 @@
 
 namespace local_sqlquerybuilder;
 
+use advanced_testcase;
 use local_sqlquerybuilder\db;
 use local_sqlquerybuilder\columns\column;
 
@@ -28,7 +29,7 @@ use local_sqlquerybuilder\columns\column;
  * @copyright   2025 Daniel Meißner
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class sqlgeneration_test extends \advanced_testcase {
+final class sqlgeneration_test extends advanced_testcase {
 
     /**
      * Test order by
@@ -42,7 +43,7 @@ final class sqlgeneration_test extends \advanced_testcase {
             ->where('deleted', '=', 0)
             ->order_desc('email')
             ->order_asc('timecreated')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -60,7 +61,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $subqueryb = db::table('entries')
             ->where('id', '=', 2);
 
-        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']])->to_sql();
+        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']])->get_sql();
         $actual = str_replace("\n", '', $actual);
 
         $this->assertEquals($expected, $actual);
@@ -75,7 +76,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $expected = "SELECT * FROM {user}";
 
         $actual = db::table('user')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -90,7 +91,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->select_count()
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -105,7 +106,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->select_sum('suspended', 'count_suspended')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -120,7 +121,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->select_max('timecreated', 'lastcreated')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -135,7 +136,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->select_min('timecreated', 'firstcreated')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -152,7 +153,7 @@ final class sqlgeneration_test extends \advanced_testcase {
             ->select('username', 'uname')
             ->select('email', 'mail')
             ->select('deleted', 'd')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -167,7 +168,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->select('username', 'uname')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -183,7 +184,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $actual = db::table('user')
             ->select('username')
             ->where('suspended', '=', 1)
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -199,7 +200,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $actual = db::table('user', 'u')
             ->select('username')
             ->where('suspended', '=', 1)
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -215,7 +216,7 @@ final class sqlgeneration_test extends \advanced_testcase {
         $actual = db::table('user')
             ->select('username')
             ->where('username', '=', 'Paul')
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -225,7 +226,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('unknown')
             ->where_in('field', [1, 2, 3])
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -239,7 +240,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('unknown')
             ->where_in('field', $latestcourses)
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -251,7 +252,7 @@ final class sqlgeneration_test extends \advanced_testcase {
             ->select('username')
             ->where('u.id', '=', 3);
 
-        $actual = db::table($subquery)->to_sql();
+        $actual = db::table($subquery)->get_sql();
 
         $this->assertEquals($expected, $actual);
     }
@@ -267,7 +268,7 @@ final class sqlgeneration_test extends \advanced_testcase {
 
         $actual = db::table('user')
             ->join('user_enrolments', ['user_enrolments.id', '=', 'user.id'])
-            ->to_sql();
+            ->get_sql();
 
         $this->assertEquals($expected, $actual);
     }

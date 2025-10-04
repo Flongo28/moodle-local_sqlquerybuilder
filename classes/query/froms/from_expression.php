@@ -14,18 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\joins;
+namespace local_sqlquerybuilder\query\froms;
+
+use local_sqlquerybuilder\query\expression;
 
 /**
- * Different allowed join types for moodle
+ * From expression
  *
+ * @package     local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum join_types: string {
-    case INNER = "";
-    case LEFT = "LEFT";
-    case FULL = "FULL";
-    case RIGHT = "RIGHT";
-    case CROSS = "CROSS";  // Todo: not supported right now.
+interface from_expression extends expression {
 }

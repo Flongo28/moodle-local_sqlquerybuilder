@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
+use BadMethodCallException;
 use dml_exception;
-use local_sqlquerybuilder\froms\from_expression;
+use local_sqlquerybuilder\query\froms\from_expression;
 use stdClass;
 
 /**
@@ -27,34 +28,51 @@ use stdClass;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class query {
-    use select;
-    use where;
-    use join;
-    use orderby;
-    use grouping;
+class query implements expression {
+    private select $selectpart;
+    private join $joinpart;
+    private where $wherepart;
+    private grouping $groupingpart;
+    private orderby $orderbypart;
 
     /**
      * Constructor
      *
      * @param from_expression $from table which concerns the query
      */
-    public function __construct(public from_expression $from) {
+    public function __construct(
+        public from_expression $from
+    ) {
+        $this->selectpart = new select();
+        $this->joinpart = new join();
+        $this->wherepart = new where();
+        $this->groupingpart = new grouping();
+        $this->orderbypart = new orderby();
     }
 
     /**
      * Compile the current builder state to a SQL query
      * @return string the SQL query
      */
-    public function to_sql(): string {
-        $sql = $this->export_select() . " "
-            . "FROM " . $this->from->export(true)
-            . $this->export_join()
-            . $this->export_where()
-            . $this->export_grouping()
-            . $this->export_orderby();
+    public function get_sql(): string {
+        $sql = $this->selectpart->get_sql() . " "
+            . "FROM " . $this->from->get_sql()
+            . $this->joinpart->get_sql()
+            . $this->wherepart->get_sql()
+            . $this->groupingpart->get_sql()
+            . $this->orderbypart->get_sql();
 
         return trim(preg_replace('/\s{2,}/', ' ', $sql));
+    }
+
+    public function get_params(): array {
+        $params = [];
+
+        foreach ($this->get_query_parts() as $part) {
+            $params[] = $part->get_params();
+        }
+
+        return array_merge(...$params);
     }
 
     /**
@@ -65,7 +83,7 @@ class query {
      */
     public function get(): array {
         global $DB;
-        return $DB->get_records_sql($this->to_sql());
+        return $DB->get_records_sql($this->get_sql());
     }
 
     /**
@@ -76,7 +94,7 @@ class query {
      */
     public function first(): ?stdClass {
         global $DB;
-        $record = $DB->get_record_sql($this->to_sql(), strictness: IGNORE_MULTIPLE);
+        $record = $DB->get_record_sql($this->get_sql(), strictness: IGNORE_MULTIPLE);
         return $record === false ? null : $record;
     }
 
@@ -88,8 +106,31 @@ class query {
      * @throws dml_exception Database is not reachable
      */
     public function find(int $id): ?stdClass {
-        $this->where('id', '=', $id);
+        $this->wherepart->where('id', '=', $id);
         return $this->first();
+    } 
+
+    private function get_query_parts(): array {
+        return [
+            $this->selectpart,
+            $this->joinpart,
+            $this->wherepart,
+            $this->groupingpart,
+            $this->orderbypart,
+        ];
+    }
+
+    public function __call($method, $args): static {
+        $parts = $this->get_query_parts();
+
+        foreach ($parts as $part) {
+            if (method_exists($part, $method)) {
+                $part->$method(...$args);
+                return $this;
+            }
+        }
+
+        throw new BadMethodCallException("Method $method is not defined");
     }
 
     /**
@@ -98,6 +139,6 @@ class query {
      * @return string Converts the query to sql
      */
     public function __toString(): string {
-        return $this->to_sql();
+        return $this->get_sql();
     }
 }

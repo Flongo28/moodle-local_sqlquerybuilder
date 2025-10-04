@@ -17,10 +17,10 @@
 namespace local_sqlquerybuilder;
 
 use Stringable;
-use local_sqlquerybuilder\query;
-use local_sqlquerybuilder\froms\from_table;
-use local_sqlquerybuilder\froms\from_query;
-use local_sqlquerybuilder\froms\from_values;
+use local_sqlquerybuilder\query\query;
+use local_sqlquerybuilder\query\froms\from_table;
+use local_sqlquerybuilder\query\froms\from_query;
+use local_sqlquerybuilder\query\froms\from_values;
 
 /**
  * Syntactic sugar for the query object
@@ -40,9 +40,9 @@ class db {
     public static function table(string|query $nameorquery, ?string $alias = null): query {
         if (is_string($nameorquery)) {
             return new query(new from_table($nameorquery, $alias));
-        } else if ($nameorquery instanceof query) {
-            return new query(new from_query($nameorquery, $alias));
         }
+
+        return new query(new from_values([[$nameorquery]], null, $alias));
     }
 
     /**
@@ -56,7 +56,7 @@ class db {
         array $table,
         ?array $aliases = null,
         string $tablename = "custom_value_table",
-    ) {
+    ): query {
         return new query(new from_values($table, $aliases, $tablename));
     }
 }

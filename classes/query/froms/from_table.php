@@ -14,29 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\columns;
+namespace local_sqlquerybuilder\query\froms;
 
 /**
- * Aggregation column with alias for select statements
+ * Data select from table
+ *
+ * e.g. a table from the database
  *
  * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class column_aggregate extends column {
-    /** @var aggregation Type of aggregation */
-    private aggregation $type;
-
+class from_table implements from_expression {
     /**
      * Constructor
      *
-     * @param aggregation $type Aggregation type to use
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
+     * @param string $table Table name
+     * @param string|null $alias Alias for the tablename
      */
-    public function __construct(aggregation $type, string $name, ?string $alias = null) {
-        $this->type = $type;
-        parent::__construct($name, $alias);
+    public function __construct(
+        /**
+         * @var string|null table name
+         */
+        private string $table,
+        /**
+         * @var string|null table alias
+         */
+        private ?string $alias,
+    ) {
     }
 
     /**
@@ -44,22 +49,21 @@ class column_aggregate extends column {
      *
      * @return string column for select as sql
      */
-    public function export(): string {
-        $column = $this->type->value . "($this->name)";
-
-        if ($this->alias !== null) {
-            $column .= " AS $this->alias";
+    public function get_sql(): string {
+        if (is_null(value: $this->alias)) {
+            return "{" . $this->table . "} ";
         }
 
-        return $column;
+        return "{" . $this->table . "} " . $this->alias . " ";
     }
 
     /**
-     * Should be the only column used
+     * No params needed
      *
-     * @return bool True
+     *
+     * @return array No params needed
      */
-    public function standalone(): bool {
-        return true;
+    public function get_params(): array {
+        return [];
     }
 }

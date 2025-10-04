@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\columns;
+namespace local_sqlquerybuilder\query\columns;
+
+use local_sqlquerybuilder\query\expression;
 
 /**
  * Raw column select
@@ -23,19 +25,28 @@ namespace local_sqlquerybuilder\columns;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class column_raw implements column_expression {
-    /** @var string Raw sql column */
-    private string $sql;
-    /** @var bool Should be the only column used */
-    private bool $onlycolumn;
+class column_raw implements column_expression, expression {
 
     /**
      * Constructor
      *
      * @param string $sql raw sql column
+     * @param mixed[] $params a list of params in the same order like the raw sql
+     * @param bool $onlycolumn true if this should be the only column selected
      */
-    public function __construct(string $sql, bool $onlycolumn = false) {
-        $this->sql = $sql;
+    public function __construct(
+        private string $sql,
+        private array $params,
+        private bool $onlycolumn = false
+    ) {}
+
+    /**
+     * Exports as sql
+     *
+     * @return string column for select as sql
+     */
+    public function get_sql(): string {
+        return $this->sql;
     }
 
     /**
@@ -43,8 +54,8 @@ class column_raw implements column_expression {
      *
      * @return string column for select as sql
      */
-    public function export(): string {
-        return $this->sql;
+    public function get_params(): array {
+        return $this->params;
     }
 
     /**

@@ -18,6 +18,7 @@ namespace local_sqlquerybuilder;
 
 use core\clock;
 use core\di;
+use advanced_testcase;
 
 /**
  * Testing the SQL generation
@@ -28,7 +29,7 @@ use core\di;
  * @copyright   2025 Matthias Opitz <m.opitz@ucl.ac.uk>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class complexquery_test extends \advanced_testcase {
+final class complexquery_test extends advanced_testcase {
 
     public function test_a_complex_query(): void {
         global $DB;

@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
-use local_sqlquerybuilder\orderings\ordering;
+use local_sqlquerybuilder\query\orderings\ordering;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -26,7 +26,7 @@ use local_sqlquerybuilder\orderings\ordering;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-trait orderby {
+class orderby implements expression {
     /**
      * @var array of orderings
      */
@@ -87,13 +87,23 @@ trait orderby {
      *
      * @return string
      */
-    protected function export_orderby(): string {
+    public function get_sql(): string {
         if (empty($this->orderings)) {
             return '';
         }
 
-        $formattedorderings = array_map(fn (ordering $order) => $order->export(), $this->orderings);
+        $formattedorderings = array_map(fn (ordering $order) => $order->get_sql(), $this->orderings);
 
         return "ORDER BY " . implode(', ', $formattedorderings);
+    }
+
+    /**
+     * Exports all used params
+     * 
+     * @return array Parameters of the expression
+     */
+    public function get_params(): array {
+        $params = array_map(fn (ordering $order) => $order->get_params(), $this->orderings);
+        return array_merge(...$params);
     }
 }

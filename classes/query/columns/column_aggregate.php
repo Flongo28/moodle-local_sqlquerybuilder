@@ -14,51 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\froms;
+namespace local_sqlquerybuilder\query\columns;
 
 /**
- * Data select from table
- *
- * e.g. a table from the database
+ * Aggregation column with alias for select statements
  *
  * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class from_table implements from_expression {
+class column_aggregate extends column {
+    /** @var aggregation Type of aggregation */
+    private aggregation $type;
+
     /**
      * Constructor
      *
-     * @param string $table Table name
-     * @param string|null $alias Alias for the tablename
+     * @param aggregation $type Aggregation type to use
+     * @param string $name Name of the column
+     * @param string|null $alias Alias for the column name
      */
-    public function __construct(
-        /**
-         * @var string|null table name
-         */
-        private string $table,
-        /**
-         * @var string|null table alias
-         */
-        private ?string $alias,
-    ) {
+    public function __construct(aggregation $type, string $name, ?string $alias = null) {
+        $this->type = $type;
+        parent::__construct($name, $alias);
     }
 
     /**
      * Exports as sql
      *
-     * @param bool $rawsql If set to true it will be exported for a raw sql query
      * @return string column for select as sql
      */
-    public function export(bool $rawsql = false): string {
-        if (!$rawsql) {
-            return $this->table;
+    public function get_sql(): string {
+        $column = $this->type->value . "($this->name)";
+
+        if ($this->alias !== null) {
+            $column .= " AS $this->alias";
         }
 
-        if (is_null($this->alias)) {
-            return "{" . $this->table . "} ";
-        }
+        return $column;
+    }
 
-        return "{" . $this->table . "} " . $this->alias . " ";
+    /**
+     * Should be the only column used
+     *
+     * @return bool True
+     */
+    public function standalone(): bool {
+        return true;
     }
 }

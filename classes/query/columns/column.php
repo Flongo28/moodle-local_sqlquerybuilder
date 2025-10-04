@@ -14,27 +14,57 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\columns;
+namespace local_sqlquerybuilder\query\columns;
+
+use local_sqlquerybuilder\query\expression;
 
 /**
- * Interface for select columns
+ * Basic column with alias for select statements
  *
  * @package local_sqlquerybuilder
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface column_expression {
+class column implements column_expression, expression {
+    /**
+     * Constructor
+     *
+     * @param string $name Name of the column
+     * @param string|null $alias Alias for the column name
+     */
+    public function __construct(
+        protected string $name,
+        protected ?string $alias = null
+    ) {}
+
     /**
      * Exports as sql
      *
      * @return string column for select as sql
      */
-    public function export(): string;
+    public function get_sql(): string {
+        if ($this->alias === null) {
+            return $this->name;
+        }
+
+        return "($this->name) AS $this->alias";
+    }
 
     /**
-     * Whether the column should be the only selected one
+     * Exports the params used
      *
-     * @return bool if true, this column should be the only one
+     * @return array No params needed
      */
-    public function standalone(): bool;
+    public function get_params(): array {
+        return [];
+    }
+
+    /**
+     * Can be used with other columns
+     *
+     * @return bool False
+     */
+    public function standalone(): bool {
+        return false;
+    }
 }

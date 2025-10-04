@@ -17,7 +17,7 @@
 namespace local_sqlquerybuilder;
 
 use local_sqlquerybuilder\db;
-use local_sqlquerybuilder\columns\column;
+use advanced_testcase;
 
 /**
  * The query_builder_test test class.
@@ -28,7 +28,7 @@ use local_sqlquerybuilder\columns\column;
  * @copyright   2025 Matthias Opitz <m.opitz@ucl.ac.uk>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class querybuilder_test extends \advanced_testcase {
+final class querybuilder_test extends advanced_testcase {
 
     public function test_user_table_matches_moodle_db(): void {
         global $DB;

@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
-use local_sqlquerybuilder\joins\join_expression;
-use local_sqlquerybuilder\joins\join_types;
+use local_sqlquerybuilder\query\joins\join_expression;
+use local_sqlquerybuilder\query\joins\join_types;
 
 /**
  * Trait that builds a sql statement, that can be exported via
@@ -27,18 +27,9 @@ use local_sqlquerybuilder\joins\join_types;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-trait join {
+class join implements expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
-
-    /**
-     * Get the allowed table aliases
-     *
-     * @return array
-     */
-    protected function get_allowed_table_aliases(): array {
-
-    }
 
     /**
      * Parse conditions array to support AND/OR logic
@@ -135,7 +126,7 @@ trait join {
     /**
      * sub join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param \local_sqlquerybuilder\query $query
+     * @param query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
@@ -148,7 +139,7 @@ trait join {
     /**
      * sub left join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param \local_sqlquerybuilder\query $query
+     * @param query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
@@ -161,7 +152,7 @@ trait join {
     /**
      * sub right join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param \local_sqlquerybuilder\query $query
+     * @param query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
@@ -190,7 +181,7 @@ trait join {
      *
      * @return string
      */
-    protected function export_join(): string {
+    public function get_sql(): string {
         if (empty($this->joins)) {
             return '';
         }
@@ -204,7 +195,7 @@ trait join {
 
             // Build the table/subquery part.
             if ($table instanceof query) {
-                $joinclause .= $jointype->value . ' JOIN (' . $table->to_sql() . ') ' . $alias . ' ON ';
+                $joinclause .= $jointype->value . ' JOIN (' . $table->get_sql() . ') ' . $alias . ' ON ';
             } else {
                 $joinclause .= $jointype->value . ' JOIN {' . $table . '} ' . $alias . ' ON ';
             }
@@ -230,5 +221,9 @@ trait join {
         }
 
         return preg_replace('/\s{2,}/', ' ', trim($joinclause));
+    }
+
+    public function get_params(): array {
+        return [];
     }
 }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
 /**
  * Grouping trait
@@ -23,7 +23,7 @@ namespace local_sqlquerybuilder;
  * @copyright   2025
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-trait grouping {
+class grouping implements expression {
     /**
      * @var array of group bu clauses
      */
@@ -85,7 +85,7 @@ trait grouping {
      *
      * @return string The complete GROUP BY clause SQL string
      */
-    protected function export_grouping(): string {
+    public function get_sql(): string {
         if (empty($this->groupby)) {
             return '';
         }
@@ -104,6 +104,11 @@ trait grouping {
                     ' ' . $having['value'] . ' ';
             }
         }
+
         return preg_replace('/\s{2,}/', ' ', $groupbyclause);
+    }
+
+    public function get_params(): array {
+        return [];
     }
 }
