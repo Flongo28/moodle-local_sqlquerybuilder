@@ -237,8 +237,8 @@ final class sqlgeneration_test extends advanced_testcase {
     }
 
     public function test_simple_where_in_clause(): void {
-        $expected = "SELECT * FROM {unknown} WHERE field IN (1, 2, 3)";
-        $expectedparams = [[1, 2, 3]];
+        $expected = "SELECT * FROM {unknown} WHERE field IN (?,?,?)";
+        $expectedparams = [1, 2, 3];
 
         $actual = db::table('unknown')
             ->where_in('field', [1, 2, 3]);

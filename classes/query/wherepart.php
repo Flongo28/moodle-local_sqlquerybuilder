@@ -30,6 +30,7 @@ use local_sqlquerybuilder\query\where\where_expression;
 use local_sqlquerybuilder\query\where\where_comparison;
 use local_sqlquerybuilder\query\where\or_where_group;
 use local_sqlquerybuilder\query\where\where_is_null;
+use local_sqlquerybuilder\query\where\where_in;
 
 /**
  * Trait for handling WHERE conditions in SQL queries.
@@ -135,6 +136,14 @@ class wherepart implements expression {
     public function or_where_notnull($column) {
         $notnullstatement = new where_is_null($column, true);
         $this->add_or_statement($notnullstatement);
+    }
+
+    public function where_in(string $column, array $values) {
+        $this->whereconditions[] = new where_in($column, $values);
+    }
+
+    public function where_not_in(string $column, array $values) {
+        $this->whereconditions[] = new where_in($column, $values, true);
     }
 
     private function add_or_statement(where_expression $expression): void {
