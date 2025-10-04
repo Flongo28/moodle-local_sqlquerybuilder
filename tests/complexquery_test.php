@@ -77,9 +77,9 @@ final class complexquery_test extends advanced_testcase {
             ->where('u.deleted', '=', 0)
             ->where('u.suspended', '=', 0)
             ->where('ue.timestart', '=', 0)
-            ->orwhere('ue.timestart', '<=', $now)
+            ->or_where('ue.timestart', '<=', $now)
             ->where('ue.timeend', '=', 0)
-            ->orwhere('ue.timeend', '>=', $now)
+            ->or_where('ue.timeend', '>=', $now)
             ->get();
 
         // Compare IDs returned.

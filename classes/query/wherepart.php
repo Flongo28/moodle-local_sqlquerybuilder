@@ -60,7 +60,7 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
      * @param mixed $othercolumn The column to compare against
      */
-    public function wherecolumn($column, $operator, $othercolumn, $negate = false) {
+    public function where_column($column, $operator, $othercolumn, $negate = false) {
         $this->whereconditions[] = new where_comparison($column, $operator, $othercolumn, $negate);
     }
 
@@ -71,7 +71,7 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function orwhere($column, $operator, $value, $negate = false) {
+    public function or_where($column, $operator, $value, $negate = false) {
         $whereclause = new where_comparison($column, $operator, $value, $negate);
         $this->add_or_statement($whereclause);
     }
@@ -85,7 +85,7 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function wherenot($column, $operator, $value) {
+    public function where_not($column, $operator, $value) {
         $this->where($column, $operator, $value, true);
     }
 
@@ -96,7 +96,7 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function orwherenot($column, $operator, $value) {
+    public function or_where_not($column, $operator, $value) {
         $this->orwhere($column, $operator, $value, true);
     }
 
@@ -105,7 +105,7 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function wherenull($column) {
+    public function where_null($column) {
         $this->whereconditions[] = new where_is_null($column);
     }
 

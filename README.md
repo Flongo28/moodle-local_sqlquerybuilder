@@ -27,9 +27,11 @@ $paul = db::table('user')->where('firstname', '=', 'Paul')
   - adapt similar queries for different use-cases
 
 ## TODOS
-- Provide LIMIT and OFFSET
-- Allow parameters in select
+- Allow subqueries in where statement
+- Allow equal functions (case sensitive, text functions ...)
+- Add union function
 - Provide more raw methods to make the plugin more flexible
+- JSON Functions
 - Update functionality
 - Delete functionality
 - Create functionality
