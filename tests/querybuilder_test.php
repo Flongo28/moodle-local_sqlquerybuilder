@@ -16,8 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
+use core\di;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\query\db;
 use advanced_testcase;
 use stdClass;
 
@@ -39,7 +39,7 @@ final class querybuilder_test extends advanced_testcase {
     public function setUp(): void {
         $this->resetAfterTest(true);
 
-        $this->db = new db();
+        $this->db = di::get(i_db::class);
 
         $generator = $this->getDataGenerator();
         $this->users['muellerpaul'] = $generator->create_user(['username' => 'muellerpaul', 'firstname' => 'Paul']);

@@ -20,7 +20,6 @@ use core\clock;
 use core\di;
 use advanced_testcase;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\query\db;
 
 /**
  * Testing the SQL generation
@@ -35,7 +34,7 @@ final class complexquery_test extends advanced_testcase {
     private i_db $db;
 
     public function setUp(): void {
-        $this->db = new db();
+        $this->db = di::get(i_db::class);
     }
 
     public function test_a_complex_query(): void {

@@ -16,9 +16,9 @@
 
 namespace local_sqlquerybuilder;
 
+use core\di;
 use advanced_testcase;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\query\db;
 
 /**
  * Testing the SQL generation
@@ -34,7 +34,7 @@ final class sqlgeneration_test extends advanced_testcase {
 
 
     public function setUp(): void {
-        $this->db = new db();
+        $this->db = di::get(i_db::class);
     }
 
     /**
