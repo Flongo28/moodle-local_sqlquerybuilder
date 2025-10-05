@@ -196,9 +196,9 @@ final class querybuilder_test extends advanced_testcase {
             ->where('u.firstname', '=', 'John')
             ->select('u.firstname');
 
-        $actual = db::from_values([[$subquerya, $subqueryb]], 'names', ['paul', 'john']);
+        $actual = db::from_values([[$subquerya, $subqueryb, "tryit"]], 'names', ['paul', 'john', 'tryit']);
         $actual = $actual->first();
 
-        $this->assertEquals(['paul' => 'Paul', 'john' => 'John'], (array)$actual);
+        $this->assertEquals(['paul' => 'Paul', 'john' => 'John', 'tryit' => 'tryit'], (array)$actual);
     }
 }

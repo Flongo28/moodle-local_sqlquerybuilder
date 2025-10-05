@@ -55,7 +55,7 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM (VALUES ((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), "Tryit")) AS custom(a,b,tryit)';
+        $expected = 'SELECT * FROM (VALUES ((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), \'Tryit\')) AS custom(a,b,tryit)';
         $expectedparams = [1, 2]; 
 
         $subquerya = db::table('users')
@@ -63,7 +63,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $subqueryb = db::table('entries')
             ->where('id', '=', 2);
 
-        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']], 'custom', ["a", "b", "tryit"]);
+        $actual = db::from_values([[$subquerya, $subqueryb, 'Tryit']], 'custom', ["a", "b", "tryit"]);
 
         $sql = $actual->get_sql();
         $sql = str_replace("\n", '', $sql);

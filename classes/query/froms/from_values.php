@@ -17,6 +17,7 @@
 namespace local_sqlquerybuilder\query\froms;
 
 use local_sqlquerybuilder\query\query;
+use Stringable;
 
 /**
  * Data select from custom given values
@@ -55,7 +56,9 @@ class from_values implements from_expression {
         foreach ($row as $value) {
             if ($value instanceof query) {
                 $formattedrow[] = "($value)";
-            } else {
+            } else if (is_string($value)) 
+                $formattedrow[] = "'$value'";
+            else {
                 $formattedrow[] = $value;
             }
         }
