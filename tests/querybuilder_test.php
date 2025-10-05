@@ -51,7 +51,8 @@ final class querybuilder_test extends advanced_testcase {
         global $DB;
 
         // Actual result using our query builder.
-        $actual = $this->db->table('user')->get();
+        $actual = $this->db->table('user')
+        ->get();
 
         // Compare
         $this->assertCount(4, $actual);
