@@ -225,8 +225,7 @@ class wherepart implements i_expression {
 
         $whereclause .= implode(' AND ', $this->whereconditions);
         $whereclause .= ' ';
-
-        return preg_replace('/\s{2,}/', ' ', $whereclause);
+        return $whereclause;
     }
 
     public function get_params(): array {

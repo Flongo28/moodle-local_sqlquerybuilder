@@ -40,7 +40,7 @@ class grouping implements i_expression {
      *
      * @param string ...$column Columns to group by
      */
-    public function groupby(string ...$column): void {
+    public function group_by(string ...$column): void {
         $this->groupby = $column;
     }
 
@@ -67,7 +67,7 @@ class grouping implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function orhaving(string $column, string $operator, mixed $value): void {
+    public function or_having(string $column, string $operator, mixed $value): void {
         $this->having[] = [
             'type' => 'OR',
             'column' => $column,

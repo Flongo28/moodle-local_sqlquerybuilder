@@ -55,16 +55,13 @@ use stdClass;
  * @method i_query order_asc(string ...$columns)                        Order results ascending by one or more columns.
  * @method i_query order_desc(string ...$columns)                       Order results descending by one or more columns.
  * @method i_query clear_order()                                        Remove any ORDER BY clauses.
- * @method i_query join(string $table, $conditions, string $alias = '') Join another table with INNER JOIN.
- * @method i_query leftjoin(string $table, $conditions, string $alias = '') Join another table with LEFT JOIN.
- * @method i_query rightjoin(string $table, $conditions, string $alias = '') Join another table with RIGHT JOIN.
- * @method i_query fulljoin(string $table, $conditions, string $alias = '') Join another table with FULL OUTER JOIN.
- * @method i_query joinsub(i_query $query, $conditions, string $alias)  Join a subquery using INNER JOIN.
- * @method i_query leftjoinsub(i_query $query, $conditions, string $alias) Join a subquery using LEFT JOIN.
- * @method i_query rightjoinsub(i_query $query, $conditions, string $alias) Join a subquery using RIGHT JOIN.
- * @method i_query groupby(string ...$column)                           Group results by one or more columns.
+ * @method i_query join(string|i_query $table, $conditions, string $alias = '') Join another table with INNER JOIN.
+ * @method i_query left_join(string|i_query $table, $conditions, string $alias = '') Join another table with LEFT JOIN.
+ * @method i_query right_join(string|i_query $table, $conditions, string $alias = '') Join another table with RIGHT JOIN.
+ * @method i_query full_join(string|i_query $table, $conditions, string $alias = '') Join another table with FULL OUTER JOIN.
+ * @method i_query group_by(string ...$column)                           Group results by one or more columns.
  * @method i_query having(string $column, string $operator, mixed $value) Add a HAVING condition for grouped queries.
- * @method i_query orhaving(string $column, string $operator, mixed $value) Add an OR HAVING condition for grouped queries.
+ * @method i_query or_having(string $column, string $operator, mixed $value) Add an OR HAVING condition for grouped queries.
  */
 interface i_query extends i_expression {
     /**

@@ -18,14 +18,14 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     local_sqlquerybuilder
- * @copyright   2025 Your Name <you@example.com>
+ * @copyright   2025 Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_sqlquerybuilder';
-$plugin->release = '0.1.0';
-$plugin->version = 2025090200;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->release = '1.0.0';
+$plugin->version = 2025100500;
+$plugin->requires = 2022112800; // Requires PHP 8.0.0 for union types
+$plugin->maturity = MATURITY_STABLE;
