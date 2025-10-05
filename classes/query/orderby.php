@@ -16,6 +16,7 @@
 
 namespace local_sqlquerybuilder\query;
 
+use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\query\orderings\ordering;
 
 /**
@@ -26,7 +27,7 @@ use local_sqlquerybuilder\query\orderings\ordering;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class orderby implements expression {
+class orderby implements i_expression {
     /**
      * @var array of orderings
      */

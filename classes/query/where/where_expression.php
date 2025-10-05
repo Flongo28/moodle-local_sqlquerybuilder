@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder\query\where;
 
-use local_sqlquerybuilder\query\expression;
+use local_sqlquerybuilder\contracts\i_expression;
 
 /**
  * Where expression
@@ -25,7 +25,7 @@ use local_sqlquerybuilder\query\expression;
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class where_expression implements expression {
+abstract class where_expression implements i_expression {
     public function get_params(): array {
         return [];
     }

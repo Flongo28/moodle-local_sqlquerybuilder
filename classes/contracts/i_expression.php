@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder\query;
+namespace local_sqlquerybuilder\contracts;
 
 /**
  * Expression Interface
@@ -24,7 +24,7 @@ namespace local_sqlquerybuilder\query;
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface expression {
+interface i_expression {
     public function get_sql(): string;
     public function get_params(): array;
 }

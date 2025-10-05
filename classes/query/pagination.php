@@ -16,6 +16,7 @@
 
 namespace local_sqlquerybuilder\query;
 
+use local_sqlquerybuilder\contracts\i_expression;
 
 
 /**
@@ -25,7 +26,7 @@ namespace local_sqlquerybuilder\query;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pagination implements expression {
+class pagination implements i_expression {
     private ?int $limit = null;
     private ?int $offset = null;
 

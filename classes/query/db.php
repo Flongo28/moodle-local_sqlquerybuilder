@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_sqlquerybuilder;
+namespace local_sqlquerybuilder\query;
 
 use Stringable;
-use local_sqlquerybuilder\query\query;
+use local_sqlquerybuilder\contracts\i_db;
+use local_sqlquerybuilder\contracts\i_query;
 use local_sqlquerybuilder\query\froms\from_table;
 use local_sqlquerybuilder\query\froms\from_query;
 use local_sqlquerybuilder\query\froms\from_values;
@@ -29,15 +30,15 @@ use local_sqlquerybuilder\query\froms\from_values;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class db {
+class db implements i_db {
 
     /**
      * Return a new query object for the given table.
      * @param string $name Name the table name
      * @param string|null $alias Alias for the tablename
-     * @return query
+     * @return i_query
      */
-    public static function table(string|query $nameorquery, ?string $alias = null): query {
+    public function table(string|i_query $nameorquery, ?string $alias = null): i_query {
         if (is_string($nameorquery)) {
             return new query(new from_table($nameorquery, $alias));
         }
@@ -52,11 +53,11 @@ class db {
      * @param string $tablename Name of the table, only used if aliases are given
      * @param string[] $rowaliases List of aliases for the columns, it needs to have the same size as each entry
      */
-    public static function from_values(
+    public function from_values(
         array $table,
         string $tablename,
         array $rowaliases,
-    ): query {
+    ): i_query {
         return new query(new from_values($table, $tablename, $rowaliases));
     }
 }

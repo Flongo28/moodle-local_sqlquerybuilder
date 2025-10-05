@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder\query\where;
 
-use local_sqlquerybuilder\query\query;
+use local_sqlquerybuilder\contracts\i_query;
 
 /**
  * Checks if the value is in the array
@@ -27,12 +27,12 @@ use local_sqlquerybuilder\query\query;
  */
 class where_in extends where_expression {
     private string $insql;
-    private array|query $params;
+    private array|i_query $params;
 
 
     public function __construct(
         private string $column,
-        array|query $values,
+        array|i_query $values,
         bool $negate = false,
     ) {
         global $DB;

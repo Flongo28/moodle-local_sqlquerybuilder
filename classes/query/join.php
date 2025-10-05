@@ -16,6 +16,8 @@
 
 namespace local_sqlquerybuilder\query;
 
+use local_sqlquerybuilder\contracts\i_expression;
+use local_sqlquerybuilder\contracts\i_query;
 use local_sqlquerybuilder\query\joins\join_expression;
 use local_sqlquerybuilder\query\joins\join_types;
 
@@ -27,7 +29,7 @@ use local_sqlquerybuilder\query\joins\join_types;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class join implements expression {
+class join implements i_expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 
@@ -126,12 +128,12 @@ class join implements expression {
     /**
      * sub join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param query $query
+     * @param i_query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function joinsub(query $query, $conditions, string $alias) {
+    public function joinsub(i_query $query, $conditions, string $alias) {
         $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::INNER, $alias];
         return $this;
     }
@@ -139,12 +141,12 @@ class join implements expression {
     /**
      * sub left join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param query $query
+     * @param i_query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function leftjoinsub(query $query, $conditions, string $alias) {
+    public function leftjoinsub(i_query $query, $conditions, string $alias) {
         $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::LEFT, $alias];
         return $this;
     }
@@ -152,12 +154,12 @@ class join implements expression {
     /**
      * sub right join - supports both single condition and array of conditions with AND/OR logic
      *
-     * @param query $query
+     * @param i_query $query
      * @param mixed $conditions Single condition or array of conditions with AND/OR logic
      * @param string $alias
      * @return $this
      */
-    public function rightjoinsub(query $query, $conditions, string $alias) {
+    public function rightjoinsub(i_query $query, $conditions, string $alias) {
         $this->joins[] = [$query, $this->parse_conditions($conditions), join_types::RIGHT, $alias];
         return $this;
     }
@@ -194,7 +196,7 @@ class join implements expression {
             $alias = $join[3];
 
             // Build the table/subquery part.
-            if ($table instanceof query) {
+            if ($table instanceof i_query) {
                 $joinclause .= $jointype->value . ' JOIN (' . $table->get_sql() . ') ' . $alias . ' ON ';
             } else {
                 $joinclause .= $jointype->value . ' JOIN {' . $table . '} ' . $alias . ' ON ';

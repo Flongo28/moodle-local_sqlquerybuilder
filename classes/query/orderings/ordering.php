@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder\query\orderings;
 
-use local_sqlquerybuilder\query\expression;
+use local_sqlquerybuilder\contracts\i_expression;
 
 /**
  * Represents an ordering
@@ -25,7 +25,7 @@ use local_sqlquerybuilder\query\expression;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ordering implements expression {
+class ordering implements i_expression {
     /**
      * Constructor
      *

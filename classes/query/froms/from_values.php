@@ -16,8 +16,7 @@
 
 namespace local_sqlquerybuilder\query\froms;
 
-use local_sqlquerybuilder\query\query;
-use Stringable;
+use local_sqlquerybuilder\contracts\i_query;
 
 /**
  * Data select from custom given values
@@ -30,7 +29,7 @@ class from_values implements from_expression {
     /**
      * Constructor
      *
-     * @param string[][]|query[][] $table Table with the structure of row[entry] (Types can be mixed)
+     * @param string[][]|i_query[][] $table Table with the structure of row[entry] (Types can be mixed)
      * @param string[]|null $rowaliases List of aliases for the columns, it needs to have the same size as each entry
      * @param ?string $tablename Name of the table, only used if aliases are given
      */
@@ -54,7 +53,7 @@ class from_values implements from_expression {
         $formattedrow = [];
 
         foreach ($row as $value) {
-            if ($value instanceof query) {
+            if ($value instanceof i_query) {
                 $formattedrow[] = "($value)";
             } else if (is_string($value)) 
                 $formattedrow[] = "'$value'";
@@ -95,7 +94,7 @@ class from_values implements from_expression {
 
         foreach ($this->table as $row) {
             foreach ($row as $colval) {
-                if ($colval instanceof query) {
+                if ($colval instanceof i_query) {
                     $params[] = $colval->get_params();
                 }
             }

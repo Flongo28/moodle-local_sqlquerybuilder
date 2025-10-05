@@ -16,7 +16,8 @@
 
 namespace local_sqlquerybuilder;
 
-use local_sqlquerybuilder\db;
+use local_sqlquerybuilder\contracts\i_db;
+use local_sqlquerybuilder\query\db;
 use advanced_testcase;
 use stdClass;
 
@@ -31,11 +32,14 @@ use stdClass;
  */
 final class querybuilder_test extends advanced_testcase {
 
-    private $users = [];
+    private i_db $db;
+    private array $users = [];
 
 
     public function setUp(): void {
         $this->resetAfterTest(true);
+
+        $this->db = new db();
 
         $generator = $this->getDataGenerator();
         $this->users['muellerpaul'] = $generator->create_user(['username' => 'muellerpaul', 'firstname' => 'Paul']);
@@ -47,7 +51,7 @@ final class querybuilder_test extends advanced_testcase {
         global $DB;
 
         // Actual result using our query builder.
-        $actual = db::table('user')->get();
+        $actual = $this->db->table('user')->get();
 
         // Compare
         $this->assertCount(4, $actual);
@@ -60,7 +64,7 @@ final class querybuilder_test extends advanced_testcase {
         global $DB;
 
         // Actual "first" record using query builder.
-        $actual = db::table('user')->offset(2)->first();
+        $actual = $this->db->table('user')->offset(2)->first();
 
         $this->assertInstanceOf(stdClass::class, $actual);
         $this->assertEquals($this->users['muellerpaul'], $actual);
@@ -70,20 +74,20 @@ final class querybuilder_test extends advanced_testcase {
         $john = $this->users['schneiderjohn'];
 
         // Actual record using query builder.
-        $actual = db::table('user')->find($john->id);
+        $actual = $this->db->table('user')->find($john->id);
 
         $this->assertInstanceOf(stdClass::class, $actual);
         $this->assertEquals($john, $actual);
     }
 
     public function test_find_returns_null_for_missing_id(): void {
-        $result = db::table('user')->find(999999);
+        $result = $this->db->table('user')->find(999999);
         $this->assertFalse($result, 'Should return false when record not found');
     }
 
     public function test_where_clause_get(): void {
         // Actual result using query builder.
-        $actual = db::table('user')->where('firstname', '=', 'Paul')->get();
+        $actual = $this->db->table('user')->where('firstname', '=', 'Paul')->get();
 
         // Compare
         $paul = $this->users['muellerpaul'];
@@ -92,7 +96,7 @@ final class querybuilder_test extends advanced_testcase {
 
     public function test_where_clause_not_equal(): void {
         // Actual result using query builder.
-        $actual = db::table('user')->where('firstname', '<>', 'Paul')->get();
+        $actual = $this->db->table('user')->where('firstname', '<>', 'Paul')->get();
 
         // Compare record content.
         $john = $this->users['schneiderjohn'];
@@ -101,25 +105,25 @@ final class querybuilder_test extends advanced_testcase {
     }
 
     public function test_from_query(): void {
-        $subquery = db::table('user', 'u')
+        $subquery = $this->db->table('user', 'u')
             ->where('u.firstname', '=', 'Paul');
 
-        $actual = db::table($subquery, 'paul');
+        $actual = $this->db->table($subquery, 'paul');
         $actual = $actual->first();
 
         $this->assertEquals($this->users['muellerpaul'], $actual);
     }
 
     public function test_from_values(): void {
-        $subquerya = db::table('user', 'u')
+        $subquerya = $this->db->table('user', 'u')
             ->where('u.firstname', '=', 'Paul')
             ->select('u.firstname');
 
-        $subqueryb = db::table('user', 'u')
+        $subqueryb = $this->db->table('user', 'u')
             ->where('u.firstname', '=', 'John')
             ->select('u.firstname');
 
-        $actual = db::from_values([[$subquerya, $subqueryb, "tryit"]], 'names', ['paul', 'john', 'tryit']);
+        $actual = $this->db->from_values([[$subquerya, $subqueryb, "tryit"]], 'names', ['paul', 'john', 'tryit']);
         $actual = $actual->first();
 
         $this->assertEquals(['paul' => 'Paul', 'john' => 'John', 'tryit' => 'tryit'], (array)$actual);

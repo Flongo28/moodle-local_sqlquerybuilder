@@ -17,8 +17,8 @@
 namespace local_sqlquerybuilder;
 
 use advanced_testcase;
-use local_sqlquerybuilder\db;
-use local_sqlquerybuilder\columns\column;
+use local_sqlquerybuilder\contracts\i_db;
+use local_sqlquerybuilder\query\db;
 
 /**
  * Testing the SQL generation
@@ -30,6 +30,12 @@ use local_sqlquerybuilder\columns\column;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class sqlgeneration_test extends advanced_testcase {
+    private i_db $db;
+
+
+    public function setUp(): void {
+        $this->db = new db();
+    }
 
     /**
      * Test order by
@@ -40,7 +46,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {users} WHERE deleted = ? ORDER BY email DESC, timecreated ASC";
         $expectedparams = [0];
 
-        $actual = db::table('users')
+        $actual = $this->db->table('users')
             ->where('deleted', '=', 0)
             ->order_desc('email')
             ->order_asc('timecreated');
@@ -58,12 +64,12 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = 'SELECT * FROM (VALUES ((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), \'Tryit\')) AS custom(a,b,tryit)';
         $expectedparams = [1, 2]; 
 
-        $subquerya = db::table('users')
+        $subquerya = $this->db->table('users')
             ->where('id', '=', 1);
-        $subqueryb = db::table('entries')
+        $subqueryb = $this->db->table('entries')
             ->where('id', '=', 2);
 
-        $actual = db::from_values([[$subquerya, $subqueryb, 'Tryit']], 'custom', ["a", "b", "tryit"]);
+        $actual = $this->db->from_values([[$subquerya, $subqueryb, 'Tryit']], 'custom', ["a", "b", "tryit"]);
 
         $sql = $actual->get_sql();
         $sql = str_replace("\n", '', $sql);
@@ -81,7 +87,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user');
+        $actual = $this->db->table('user');
 
         $this->assertEquals($expected, $actual->get_sql());
         $this->assertEquals($expectedparams, $actual->get_params());
@@ -96,7 +102,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT COUNT(1) FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select_count();
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -112,7 +118,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT SUM(suspended) AS count_suspended FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select_sum('suspended', 'count_suspended');
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -128,7 +134,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT MAX(timecreated) AS lastcreated FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select_max('timecreated', 'lastcreated');
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -144,7 +150,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT MIN(timecreated) AS firstcreated FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select_min('timecreated', 'firstcreated');
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -160,7 +166,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {user} LIMIT 5";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->limit(5);
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -171,7 +177,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {user} OFFSET 5";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->offset(5);
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -187,7 +193,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT (username) AS uname, (email) AS mail, (deleted) AS d FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select('username', 'uname')
             ->select('email', 'mail')
             ->select('deleted', 'd');
@@ -205,7 +211,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT (username) AS uname FROM {user}";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select('username', 'uname');
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -221,7 +227,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT username FROM {user} WHERE suspended = ?";
         $expectedparams = [1];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select('username')
             ->where('suspended', '=', 1);
 
@@ -238,7 +244,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT username FROM {user} u WHERE suspended = ?";
         $expectedparams = [1];
 
-        $actual = db::table('user', 'u')
+        $actual = $this->db->table('user', 'u')
             ->select('username')
             ->where('suspended', '=', 1);
 
@@ -255,7 +261,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT username FROM {user} WHERE username = ?";
         $expectedparams = ['Paul'];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->select('username')
             ->where('username', '=', 'Paul');
 
@@ -267,7 +273,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {unknown} WHERE field IN (?,?,?)";
         $expectedparams = [1, 2, 3];
 
-        $actual = db::table('unknown')
+        $actual = $this->db->table('unknown')
             ->where_in('field', [1, 2, 3]);
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -278,11 +284,11 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM {unknown} WHERE field IN (SELECT id FROM {course} WHERE timestart > ?)";
         $expectedparams = [1];
 
-        $latestcourses = db::table('course')
+        $latestcourses = $this->db->table('course')
             ->select('id')
             ->where('timestart', '>', 1);
 
-        $actual = db::table('unknown')
+        $actual = $this->db->table('unknown')
             ->where_in('field', $latestcourses);
 
         $this->assertEquals($expected, $actual->get_sql());
@@ -293,11 +299,11 @@ final class sqlgeneration_test extends advanced_testcase {
         $expected = "SELECT * FROM (SELECT username FROM {user} u WHERE u.id = ?) AS thirduser";
         $expectedparams = [3];
 
-        $subquery = db::table('user', 'u')
+        $subquery = $this->db->table('user', 'u')
             ->select('username')
             ->where('u.id', '=', 3);
 
-        $actual = db::table($subquery, 'thirduser');
+        $actual = $this->db->table($subquery, 'thirduser');
 
         $sql = $actual->get_sql();
         $sql = str_replace("\n", '', $sql);
@@ -315,7 +321,7 @@ final class sqlgeneration_test extends advanced_testcase {
             . "JOIN {user_enrolments} ON user_enrolments.id = user.id";
         $expectedparams = [];
 
-        $actual = db::table('user')
+        $actual = $this->db->table('user')
             ->join('user_enrolments', ['user_enrolments.id', '=', 'user.id']);
 
         $this->assertEquals($expected, $actual->get_sql());

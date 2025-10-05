@@ -19,6 +19,8 @@ namespace local_sqlquerybuilder;
 use core\clock;
 use core\di;
 use advanced_testcase;
+use local_sqlquerybuilder\contracts\i_db;
+use local_sqlquerybuilder\query\db;
 
 /**
  * Testing the SQL generation
@@ -30,6 +32,11 @@ use advanced_testcase;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class complexquery_test extends advanced_testcase {
+    private i_db $db;
+
+    public function setUp(): void {
+        $this->db = new db();
+    }
 
     public function test_a_complex_query(): void {
         global $DB;
@@ -70,7 +77,7 @@ final class complexquery_test extends advanced_testcase {
 
 
         // Actual result using query builder.
-        $actual = db::table('enrol', 'e')
+        $actual = $this->db->table('enrol', 'e')
             ->distinct()
             ->join('user_enrolments', ['ue.enrolid', '=', 'e.id'], 'ue')
             ->join('user', ['u.id', '=', 'ue.userid'], 'u')

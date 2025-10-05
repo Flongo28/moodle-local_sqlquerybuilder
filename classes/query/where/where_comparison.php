@@ -17,7 +17,7 @@
 namespace local_sqlquerybuilder\query\where;
 
 use InvalidArgumentException;
-use local_sqlquerybuilder\query\query;
+use local_sqlquerybuilder\contracts\i_query;
 
 /**
  * Where expression
@@ -56,7 +56,7 @@ class where_comparison extends where_expression {
 
         $sql .= "$this->column $this->operator ";
 
-        if ($this->value instanceof query) {
+        if ($this->value instanceof i_query) {
             $sql .= "($this->value)";
         } else {
             $sql .= '?';
@@ -66,7 +66,7 @@ class where_comparison extends where_expression {
     }
 
     public function get_params(): array {
-        if ($this->value instanceof query) {
+        if ($this->value instanceof i_query) {
             return $this->value->get_params();
         }
 

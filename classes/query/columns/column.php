@@ -16,8 +16,6 @@
 
 namespace local_sqlquerybuilder\query\columns;
 
-use local_sqlquerybuilder\query\expression;
-
 /**
  * Basic column with alias for select statements
  *
@@ -25,7 +23,7 @@ use local_sqlquerybuilder\query\expression;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class column implements column_expression, expression {
+class column implements column_expression {
     /**
      * Constructor
      *

@@ -16,9 +16,9 @@
 
 namespace local_sqlquerybuilder\query;
 
+use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\query\columns\aggregation;
 use local_sqlquerybuilder\query\columns\column_aggregate;
-use local_sqlquerybuilder\query\columns\column_expression;
 use local_sqlquerybuilder\query\columns\column_raw;
 use local_sqlquerybuilder\query\columns\column;
 
@@ -30,8 +30,8 @@ use local_sqlquerybuilder\query\columns\column;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class select implements expression {
-    /** @var expression[] SQL Select Parts */
+class select implements i_expression {
+    /** @var i_expression[] SQL Select Parts */
     protected array $select = [];
 
     /** @var bool Whether to use DISTINCT OR ALL */
@@ -124,7 +124,7 @@ class select implements expression {
             $this->select_all();
         }
 
-        $exportedcolumns = array_map(fn (expression $col) => $col->get_sql(), $this->select);
+        $exportedcolumns = array_map(fn (i_expression $col) => $col->get_sql(), $this->select);
         $select .= implode(', ', $exportedcolumns);
 
         return $select;

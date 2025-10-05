@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder\query\froms;
 
-use local_sqlquerybuilder\query\query;
+use local_sqlquerybuilder\contracts\i_query;
 
 /**
  * Data select from a custom query
@@ -29,11 +29,11 @@ class from_query implements from_expression {
     /**
      * Constructor
      *
-     * @param query $sourcequery Query that builds a table
+     * @param i_query $sourcequery Query that builds a table
      * @param string $alias Alias for the table builded by the query (alias is needed!)
      */
     public function __construct(
-        private query $sourcequery,
+        private i_query $sourcequery,
         private string $alias,
     ) {
     }

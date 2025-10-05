@@ -18,8 +18,9 @@ namespace local_sqlquerybuilder\query;
 
 use BadMethodCallException;
 use dml_exception;
-use local_sqlquerybuilder\query\froms\from_expression;
 use stdClass;
+use local_sqlquerybuilder\contracts\i_query;
+use local_sqlquerybuilder\query\froms\from_expression;
 
 /**
  * A Query builder
@@ -28,7 +29,7 @@ use stdClass;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class query implements expression {
+class query implements i_query {
     private select $selectpart;
     private join $joinpart;
     private wherepart $wherepart;
@@ -125,7 +126,7 @@ class query implements expression {
         ];
     }
 
-    public function __call($method, $args): static {
+    public function __call($method, $args): i_query {
         $parts = $this->get_query_parts();
 
         foreach ($parts as $part) {

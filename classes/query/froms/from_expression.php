@@ -16,7 +16,7 @@
 
 namespace local_sqlquerybuilder\query\froms;
 
-use local_sqlquerybuilder\query\expression;
+use local_sqlquerybuilder\contracts\i_expression;
 
 /**
  * From expression
@@ -25,5 +25,5 @@ use local_sqlquerybuilder\query\expression;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface from_expression extends expression {
+interface from_expression extends i_expression {
 }

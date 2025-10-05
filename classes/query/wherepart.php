@@ -26,6 +26,8 @@ namespace local_sqlquerybuilder\query;
 
 use core\clock;
 use core\di;
+use local_sqlquerybuilder\contracts\i_query;
+use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\query\where\like_options;
 use local_sqlquerybuilder\query\where\where_column_comparison;
 use local_sqlquerybuilder\query\where\where_expression;
@@ -41,7 +43,7 @@ use local_sqlquerybuilder\query\where\where_like;
  *
  * This trait provides methods for building WHERE clauses with AND and OR conditions.
  */
-class wherepart implements expression {
+class wherepart implements i_expression {
 
     /** @var where_expression[] All where expressions */
     protected array $whereconditions = [];
@@ -162,11 +164,11 @@ class wherepart implements expression {
         $this->combine_last_two_by_or();
     }
 
-    public function where_in(string $column, array|query $values, bool $negate = false) {
+    public function where_in(string $column, array|i_query $values, bool $negate = false) {
         $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
-    public function where_not_in(string $column, array|query $values) {
+    public function where_not_in(string $column, array|i_query $values): void {
         $this->where_in($column, $values, true);
     }
 

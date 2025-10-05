@@ -16,6 +16,8 @@
 
 namespace local_sqlquerybuilder\query\columns;
 
+use local_sqlquerybuilder\contracts\i_expression;
+
 /**
  * Interface for select columns
  *
@@ -23,7 +25,7 @@ namespace local_sqlquerybuilder\query\columns;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface column_expression {
+interface column_expression extends i_expression {
     /**
      * Whether the column should be the only selected one
      *
