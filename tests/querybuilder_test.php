@@ -114,7 +114,7 @@ final class querybuilder_test extends advanced_testcase {
         $this->resetAfterTest(true);
 
         $result = db::table('user')->find(999999);
-        $this->assertNull($result, 'Should return null when record not found');
+        $this->assertFalse($result, 'Should return false when record not found');
     }
 
     public function test_where_clause_get(): void {
@@ -165,4 +165,40 @@ final class querybuilder_test extends advanced_testcase {
         }
     }
 
+    public function test_from_query(): void {
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $paul = $generator->create_user(['firstname' => 'Paul']);
+        $john = $generator->create_user(['firstname' => 'John']);
+
+        $subquery = db::table('user', 'u')
+            ->where('u.firstname', '=', 'Paul');
+
+        $actual = db::table($subquery, 'paul');
+        $actual = $actual->first();
+
+        $this->assertEquals($paul, $actual);
+    }
+
+    public function test_from_values(): void {
+        $this->resetAfterTest(true);
+
+        $generator = $this->getDataGenerator();
+        $paul = $generator->create_user(['firstname' => 'Paul']);
+        $john = $generator->create_user(['firstname' => 'John']);
+
+        $subquerya = db::table('user', 'u')
+            ->where('u.firstname', '=', 'Paul')
+            ->select('u.firstname');
+
+        $subqueryb = db::table('user', 'u')
+            ->where('u.firstname', '=', 'John')
+            ->select('u.firstname');
+
+        $actual = db::from_values([[$subquerya, $subqueryb]], 'names', ['paul', 'john']);
+        $actual = $actual->first();
+
+        $this->assertEquals(['paul' => 'Paul', 'john' => 'John'], (array)$actual);
+    }
 }

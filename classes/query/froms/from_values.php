@@ -29,9 +29,9 @@ class from_values implements from_expression {
     /**
      * Constructor
      *
-     * @param string|query[][] $table Table with the structure of row[entry]
-     * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
-     * @param string $tablename Name of the table, only used if aliases are given
+     * @param string[][]|query[][] $table Table with the structure of row[entry] (Types can be mixed)
+     * @param string[]|null $rowaliases List of aliases for the columns, it needs to have the same size as each entry
+     * @param ?string $tablename Name of the table, only used if aliases are given
      */
     public function __construct(
         /**
@@ -39,14 +39,28 @@ class from_values implements from_expression {
          */
         private array $table,
         /**
+         * @var ?string table name
+         */
+        private ?string $tablename = null,
+        /**
          * @var array|null table asliases
          */
-        private ?array $aliases,
-        /**
-         * @var string table name
-         */
-        private string $tablename,
+        private ?array $rowaliases = null,
     ) {
+    }
+
+    private function format_row(array $row): string {
+        $formattedrow = [];
+
+        foreach ($row as $value) {
+            if ($value instanceof query) {
+                $formattedrow[] = "($value)";
+            } else {
+                $formattedrow[] = $value;
+            }
+        }
+
+        return "(" . implode(', ', $formattedrow) . ")";
     }
 
     /**
@@ -56,19 +70,18 @@ class from_values implements from_expression {
      * @return string column for select as sql
      */
     public function get_sql(): string {
-        $from = "VALUES(\n";
+        $from = "(VALUES ";
 
-        foreach ($this->table as $row) {
-            $from .= "(";
-            $formattedrow = array_map(fn ($colval) => "($colval)", $row);
-            $from .= implode(', ', $formattedrow);
-            $from .= ")\n";
-        }
+        $formattedrows = array_map(fn ($row) => $this->format_row($row), $this->table);
+        $from .= implode(", ", $formattedrows);
+        $from .= ") ";
 
-        $from .= ")";
+        if (!is_null($this->tablename)) {
+            $from .= "AS $this->tablename";
 
-        if (!is_null($this->aliases)) {
-            $from .= " AS $this->tablename(" . implode(',', $this->aliases) . ") ";
+            if (!is_null($this->rowaliases)) {
+                $from .= "(" . implode(',', $this->rowaliases) . ") ";
+            }
         }
 
         return $from;

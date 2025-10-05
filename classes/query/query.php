@@ -92,23 +92,23 @@ class query implements expression {
     /**
      * Get the first entry from the query
      *
-     * @return stdClass|null An entry if found one
+     * @return stdClass|false An entry if found one
      * @throws dml_exception Database is not reachable
      */
-    public function first(): ?stdClass {
+    public function first(): stdClass|false {
         global $DB;
         $record = $DB->get_record_sql($this->get_sql(), $this->get_params(), strictness: IGNORE_MULTIPLE);
-        return $record === false ? null : $record;
+        return $record;
     }
 
     /**
      * Returns the entry searched id
      *
      * @param int $id Search ID
-     * @return stdClass|null An entry if found one
+     * @return stdClass|false An entry if found one
      * @throws dml_exception Database is not reachable
      */
-    public function find(int $id): ?stdClass {
+    public function find(int $id): stdClass|false {
         $this->wherepart->where('id', '=', $id);
         return $this->first();
     } 

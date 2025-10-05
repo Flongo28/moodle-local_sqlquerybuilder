@@ -42,21 +42,21 @@ class db {
             return new query(new from_table($nameorquery, $alias));
         }
 
-        return new query(new from_values([[$nameorquery]], null, $alias));
+        return new query(new from_query($nameorquery, $alias));
     }
 
     /**
      * Creates a query on a custom made query
      *
      * @param Stringable[][] $table Table with the structure of row[entry]
-     * @param string[]|null $aliases List of aliases for the columns, it needs to have the same size as each entry
      * @param string $tablename Name of the table, only used if aliases are given
+     * @param string[] $rowaliases List of aliases for the columns, it needs to have the same size as each entry
      */
     public static function from_values(
         array $table,
-        ?array $aliases = null,
-        string $tablename = "custom_value_table",
+        string $tablename,
+        array $rowaliases,
     ): query {
-        return new query(new from_values($table, $aliases, $tablename));
+        return new query(new from_values($table, $tablename, $rowaliases));
     }
 }

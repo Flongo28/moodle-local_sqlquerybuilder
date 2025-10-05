@@ -55,7 +55,7 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM VALUES(((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), ("Tryit")))';
+        $expected = 'SELECT * FROM (VALUES ((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), "Tryit")) AS custom(a,b,tryit)';
         $expectedparams = [1, 2]; 
 
         $subquerya = db::table('users')
@@ -63,7 +63,7 @@ final class sqlgeneration_test extends advanced_testcase {
         $subqueryb = db::table('entries')
             ->where('id', '=', 2);
 
-        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']]);
+        $actual = db::from_values([[$subquerya, $subqueryb, '"Tryit"']], 'custom', ["a", "b", "tryit"]);
 
         $sql = $actual->get_sql();
         $sql = str_replace("\n", '', $sql);
@@ -290,16 +290,18 @@ final class sqlgeneration_test extends advanced_testcase {
     }
 
     public function test_from_with_subquery(): void {
-        $expected = "SELECT * FROM (SELECT username FROM {user} u WHERE u.id = 3)";
+        $expected = "SELECT * FROM (SELECT username FROM {user} u WHERE u.id = ?) AS thirduser";
         $expectedparams = [3];
 
         $subquery = db::table('user', 'u')
             ->select('username')
             ->where('u.id', '=', 3);
 
-        $actual = db::table($subquery);
+        $actual = db::table($subquery, 'thirduser');
 
-        $this->assertEquals($expected, $actual->get_sql());
+        $sql = $actual->get_sql();
+        $sql = str_replace("\n", '', $sql);
+        $this->assertEquals($expected, $sql);
         $this->assertEquals($expectedparams, $actual->get_params());
     }
 
