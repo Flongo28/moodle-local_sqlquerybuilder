@@ -43,15 +43,15 @@ final class complexquery_test extends advanced_testcase {
 
         // Enrol both users.
         $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
-        $manualplugin = enrol_get_plugin('manual');
         $enrolinstances = enrol_get_instances($course->id, true);
         $manualinstance = array_values(array_filter($enrolinstances, fn($e) => $e->enrol === 'manual'))[0];
-        $manualplugin->enrol_user($manualinstance, $user1->id, $studentrole->id);
-        $manualplugin->enrol_user($manualinstance, $user2->id, $studentrole->id);
 
-        $now = di::get(clock::class)->time();
+        $manualenrolplugin = enrol_get_plugin('manual');
+        $manualenrolplugin->enrol_user($manualinstance, $user1->id, $studentrole->id);
+        $manualenrolplugin->enrol_user($manualinstance, $user2->id, $studentrole->id);
 
         // Expected result using raw SQL.
+        $now = di::get(clock::class)->time();
         $sql = "SELECT DISTINCT ue.userid
               FROM {enrol} e
               JOIN {user_enrolments} ue ON ue.enrolid = e.id
@@ -60,12 +60,14 @@ final class complexquery_test extends advanced_testcase {
                AND u.deleted = 0
                AND u.suspended = 0
                AND (ue.timestart = 0 OR ue.timestart <= :now1)
-               AND (ue.timeend = 0 OR ue.timeend >= :now2)";
+               AND (ue.timeend = 0 OR ue.timeend >= :now2)
+          ORDER BY ue.userid";
         $params = [
             'now1' => $now,
             'now2' => $now,
         ];
         $expected = $DB->get_records_sql($sql, $params);
+
 
         // Actual result using query builder.
         $actual = db::table('enrol', 'e')
@@ -76,20 +78,11 @@ final class complexquery_test extends advanced_testcase {
             ->where('ue.status', '=', 0)
             ->where('u.deleted', '=', 0)
             ->where('u.suspended', '=', 0)
-            ->where('ue.timestart', '=', 0)
-            ->or_where('ue.timestart', '<=', $now)
-            ->where('ue.timeend', '=', 0)
-            ->or_where('ue.timeend', '>=', $now)
+            ->time_between('ue.timestart', 'ue.timeend')
+            ->order_asc("ue.userid")
             ->get();
 
-        // Compare IDs returned.
-        $expectedids = array_keys($expected);
-        $actualids   = array_map(fn($r) => $r->userid, $actual);
-
-        sort($expectedids);
-        sort($actualids);
-
-        $this->assertEquals($expectedids, $actualids, 'QueryBuilder must return the same enrolled user IDs as raw SQL');
+        $this->assertEquals($expected, $actual, 'QueryBuilder must return the same enrolled user IDs as raw SQL');
     }
 
 }

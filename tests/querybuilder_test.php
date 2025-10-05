@@ -18,6 +18,7 @@ namespace local_sqlquerybuilder;
 
 use local_sqlquerybuilder\db;
 use advanced_testcase;
+use stdClass;
 
 /**
  * The query_builder_test test class.
@@ -30,164 +31,86 @@ use advanced_testcase;
  */
 final class querybuilder_test extends advanced_testcase {
 
-    public function test_user_table_matches_moodle_db(): void {
-        global $DB;
+    private $users = [];
 
+
+    public function setUp(): void {
         $this->resetAfterTest(true);
 
-        // Create a few test users.
         $generator = $this->getDataGenerator();
-        $generator->create_user(['username' => 'alice']);
-        $generator->create_user(['username' => 'bob']);
-        $generator->create_user(['username' => 'carol']);
+        $this->users['muellerpaul'] = $generator->create_user(['username' => 'muellerpaul', 'firstname' => 'Paul']);
+        $this->users['schneiderjohn'] = $generator->create_user(['username' => 'schneiderjohn', 'firstname' => 'John']);
+    }
 
-        // Expected result using Moodle's DB API.
-        $expected = $DB->get_records('user');
+
+    public function test_user_table_matches_moodle_db(): void {
+        global $DB;
 
         // Actual result using our query builder.
         $actual = db::table('user')->get();
 
-        // If your query builder returns associative array with ids as keys,
-        // then we can compare directly. Otherwise, normalise both.
-        $expectedids = array_keys($expected);
-        $actualids   = array_keys($actual);
-
-        sort($expectedids);
-        sort($actualids);
-
-        $this->assertEquals($expectedids, $actualids, 'User IDs must match');
-
-        // Optionally compare the full records (cast to arrays if necessary).
-        foreach ($expected as $id => $user) {
-            $this->assertEqualsCanonicalizing(
-                (array)$user,
-                (array)$actual[$id],
-                "Mismatch in record with id $id"
-            );
+        // Compare
+        $this->assertCount(4, $actual);
+        foreach ($this->users as $user) {
+            $this->assertEquals($user, $actual[$user->id]);
         }
     }
 
     public function test_first_user_matches_moodle_db(): void {
         global $DB;
 
-        $this->resetAfterTest(true);
-
-        // Create some users.
-        $generator = $this->getDataGenerator();
-        $u1 = $generator->create_user(['username' => 'alice']);
-        $u2 = $generator->create_user(['username' => 'bob']);
-        $u3 = $generator->create_user(['username' => 'carol']);
-
-        // Expected "first" record using Moodle DB API.
-        $expected = $DB->get_record('user', [], '*', IGNORE_MULTIPLE);
-
         // Actual "first" record using query builder.
-        $actual = db::table('user')->first();
+        $actual = db::table('user')->offset(2)->first();
 
-        // Assert both are stdClass and have the same ID.
-        $this->assertInstanceOf(\stdClass::class, $actual);
-        $this->assertEquals($expected->id, $actual->id);
-
-        // Optionally compare all fields.
-        $this->assertEquals((array)$expected, (array)$actual);
+        $this->assertInstanceOf(stdClass::class, $actual);
+        $this->assertEquals($this->users['muellerpaul'], $actual);
     }
 
     public function test_find_user_by_id(): void {
-        global $DB;
-
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-        $user = $generator->create_user(['username' => 'david']);
-
-        // Expected record using Moodle's DB API.
-        $expected = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
+        $john = $this->users['schneiderjohn'];
 
         // Actual record using query builder.
-        $actual = db::table('user')->find($user->id);
+        $actual = db::table('user')->find($john->id);
 
-        $this->assertInstanceOf(\stdClass::class, $actual);
-        $this->assertEquals((array)$expected, (array)$actual);
+        $this->assertInstanceOf(stdClass::class, $actual);
+        $this->assertEquals($john, $actual);
     }
 
     public function test_find_returns_null_for_missing_id(): void {
-        $this->resetAfterTest(true);
-
         $result = db::table('user')->find(999999);
         $this->assertFalse($result, 'Should return false when record not found');
     }
 
     public function test_where_clause_get(): void {
-        global $DB;
-
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-        $paul = $generator->create_user(['firstname' => 'Paul']);
-        $john = $generator->create_user(['firstname' => 'John']);
-
-        // Expected result using Moodle DB API.
-        $expected = $DB->get_records('user', ['firstname' => 'Paul']);
-
         // Actual result using query builder.
         $actual = db::table('user')->where('firstname', '=', 'Paul')->get();
 
-        // Compare IDs.
-        $this->assertEquals(array_keys($expected), array_keys($actual));
-
-        // Compare record content.
-        foreach ($expected as $id => $user) {
-            $this->assertEquals((array)$user, (array)$actual[$id]);
-        }
+        // Compare
+        $paul = $this->users['muellerpaul'];
+        $this->assertEquals([$paul->id => $paul], $actual);
     }
 
     public function test_where_clause_not_equal(): void {
-        global $DB;
-
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-        $paul = $generator->create_user(['firstname' => 'Paul']);
-        $john = $generator->create_user(['firstname' => 'John']);
-
-        // Expected result: all users where firstname <> 'Paul'.
-        $expected = $DB->get_records_select('user', "firstname <> :name", ['name' => 'Paul']);
-
         // Actual result using query builder.
         $actual = db::table('user')->where('firstname', '<>', 'Paul')->get();
 
-        // Compare IDs.
-        $this->assertEquals(array_keys($expected), array_keys($actual));
-
         // Compare record content.
-        foreach ($expected as $id => $user) {
-            $this->assertEquals((array)$user, (array)$actual[$id]);
-        }
+        $john = $this->users['schneiderjohn'];
+        $this->assertCount(3, $actual);
+        $this->assertEquals($john, $actual[$john->id]);
     }
 
     public function test_from_query(): void {
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-        $paul = $generator->create_user(['firstname' => 'Paul']);
-        $john = $generator->create_user(['firstname' => 'John']);
-
         $subquery = db::table('user', 'u')
             ->where('u.firstname', '=', 'Paul');
 
         $actual = db::table($subquery, 'paul');
         $actual = $actual->first();
 
-        $this->assertEquals($paul, $actual);
+        $this->assertEquals($this->users['muellerpaul'], $actual);
     }
 
     public function test_from_values(): void {
-        $this->resetAfterTest(true);
-
-        $generator = $this->getDataGenerator();
-        $paul = $generator->create_user(['firstname' => 'Paul']);
-        $john = $generator->create_user(['firstname' => 'John']);
-
         $subquerya = db::table('user', 'u')
             ->where('u.firstname', '=', 'Paul')
             ->select('u.firstname');
