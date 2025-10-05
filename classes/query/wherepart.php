@@ -55,12 +55,12 @@ class wherepart implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function where(string $column, string $operator, mixed $value, bool $negate = false) {
+    public function where(string $column, string $operator, mixed $value, bool $negate = false): void {
         if ($operator == 'like') {
             $this->whereconditions[] = new where_like($column, $value, $negate);    
+        } else {
+            $this->whereconditions[] = new where_comparison($column, $operator, $value, $negate);
         }
-
-        $this->whereconditions[] = new where_comparison($column, $operator, $value, $negate);
     }
 
     /**
@@ -70,7 +70,7 @@ class wherepart implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
      * @param mixed $othercolumn The column to compare against
      */
-    public function where_column(string $column, $operator, $othercolumn, bool $negate = false) {
+    public function where_column(string $column, string $operator, string $othercolumn, bool $negate = false): void {
         $this->whereconditions[] = new where_column_comparison($column, $operator, $othercolumn, $negate);
     }
 
@@ -81,7 +81,7 @@ class wherepart implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function or_where(string $column, string $operator, $value, bool $negate = false) {
+    public function or_where(string $column, string $operator, mixed $value, bool $negate = false): void {
         $this->where($column, $operator, $value, $negate);
         $this->combine_last_two_by_or();
     }
@@ -95,7 +95,7 @@ class wherepart implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function where_not(string $column, string $operator, $value) {
+    public function where_not(string $column, string $operator, mixed $value): void {
         $this->where($column, $operator, $value, true);
     }
 
@@ -106,23 +106,23 @@ class wherepart implements i_expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function or_where_not(string $column, string $operator, $value) {
+    public function or_where_not(string $column, string $operator, mixed $value): void {
         $this->or_where($column, $operator, $value, true);
     }
 
-    public function where_fulltext(string $column, string $value, bool $negate = false) {
+    public function where_fulltext(string $column, string $value, bool $negate = false): void {
         $this->whereconditions[] = new where_fulltext($column, $value, $negate);
     }
 
-    public function where_fulltext_not(string $column, string $value) {
+    public function where_fulltext_not(string $column, string $value): void {
         $this->whereconditions[] = new where_fulltext($column, $value, true);
     }
 
-    public function where_like(string $column, string $value, like_options $options = null, bool $negate = false) {
+    public function where_like(string $column, string $value, like_options $options = null, bool $negate = false): void {
         $this->whereconditions[] = new where_like($column, $value, $negate, $options);
     }
 
-    public function where_not_like(string $column, string $value, like_options $options = null) {
+    public function where_not_like(string $column, string $value, like_options $options = null): void {
         $this->where_like($column, $value, $options, true);
     }
 
@@ -131,7 +131,7 @@ class wherepart implements i_expression {
      *
      * @param string $column The column name
      */
-    public function where_null(string $column) {
+    public function where_null(string $column): void {
         $this->whereconditions[] = new where_is_null($column);
     }
 
@@ -140,7 +140,7 @@ class wherepart implements i_expression {
      *
      * @param string $column The column name
      */
-    public function or_where_null(string $column) {
+    public function or_where_null(string $column): void {
         $this->where_null($column);
         $this->combine_last_two_by_or();
     }
@@ -150,7 +150,7 @@ class wherepart implements i_expression {
      *
      * @param string $column The column name
      */
-    public function where_notnull(string $column) {
+    public function where_notnull(string $column): void {
         $this->whereconditions[] = new where_is_null($column, true);
     }
 
@@ -159,12 +159,12 @@ class wherepart implements i_expression {
      *
      * @param string $column The column name
      */
-    public function or_where_notnull(string $column) {
+    public function or_where_notnull(string $column): void {
         $this->where_notnull($column);
         $this->combine_last_two_by_or();
     }
 
-    public function where_in(string $column, array|i_query $values, bool $negate = false) {
+    public function where_in(string $column, array|i_query $values, bool $negate = false): void {
         $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
@@ -200,18 +200,14 @@ class wherepart implements i_expression {
      *
      * @param string $columntimestart Column with start time
      * @param string $columntimeend Column with end time
-     * @param int|null $timebetween Timestamp which will be checked to be between the start and end
-     *                              If null checks for the current time
      */
-    public function time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null): void {
-        if (is_null($timebetween)) {
-            $timebetween = di::get(clock::class)->time();
-        }
+    public function where_currently_active(string $columntimestart, string $columntimeend): void {
+        $currenttime = di::get(clock::class)->time();
 
-        $this->where($columntimestart, '=', 0);
-        $this->or_where($columntimestart, '<=', $timebetween);
-        $this->where($columntimeend, '=', 0);
-        $this->or_where($columntimeend, '>=', $timebetween);
+        $this->where_null($columntimestart);
+        $this->or_where($columntimestart, '<=', $currenttime);
+        $this->where_null($columntimeend);
+        $this->or_where($columntimeend, '>=', $currenttime);
     }
 
     /**

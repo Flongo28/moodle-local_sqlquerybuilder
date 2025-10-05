@@ -44,7 +44,7 @@ use stdClass;
  * @method i_query or_where_notnull(string $column)
  * @method i_query where_in(string $column, array|i_query $values, bool $negate = false)
  * @method i_query where_not_in(string $column, array|i_query $values)
- * @method i_query time_between(string $columntimestart, string $columntimeend, ?int $timebetween = null)
+ * @method i_query where_currently_active(string $columntimestart, string $columntimeend)
  * @method i_query select_all()
  * @method i_query select(string $name, ?string $alias = null)
  * @method i_query select_count()

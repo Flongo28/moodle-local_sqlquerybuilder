@@ -31,8 +31,8 @@ use local_sqlquerybuilder\query\columns\column;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class select implements i_expression {
-    /** @var i_expression[] SQL Select Parts */
-    protected array $select = [];
+    /** @var i_expression[] Selected columns */
+    protected array $columns = [];
 
     /** @var bool Whether to use DISTINCT OR ALL */
     protected bool $distinct = false;
@@ -43,7 +43,7 @@ class select implements i_expression {
      * Should not be used with other selects
      */
     public function select_all(): void {
-        $this->select = [new column_raw('*', [], true)];
+        $this->columns = [new column_raw('*', [], true)];
     }
 
     /**
@@ -53,7 +53,7 @@ class select implements i_expression {
      * @param string|null $alias Alias for the column name
      */
     public function select(string $name, ?string $alias = null): void {
-        $this->select[] = new column($name, $alias);
+        $this->columns[] = new column($name, $alias);
     }
 
     /**
@@ -62,7 +62,7 @@ class select implements i_expression {
      * Should not be used with other selects
      */
     public function select_count(): void {
-        $this->select[] = new column_aggregate(aggregation::COUNT, '1');
+        $this->columns = [new column_aggregate(aggregation::COUNT, '1')];
     }
 
     /**
@@ -74,7 +74,7 @@ class select implements i_expression {
      * @param string|null $alias Alias for the column name
      */
     public function select_max(string $name, ?string $alias = null): void {
-        $this->select[] = new column_aggregate(aggregation::MAX, $name, $alias);
+        $this->columns = [new column_aggregate(aggregation::MAX, $name, $alias)];
     }
 
     /**
@@ -86,7 +86,7 @@ class select implements i_expression {
      * @param string|null $alias Alias for the column name
      */
     public function select_min(string $name, ?string $alias = null): void {
-        $this->select[] = new column_aggregate(aggregation::MIN, $name, $alias);
+        $this->columns = [new column_aggregate(aggregation::MIN, $name, $alias)];
     }
 
     /**
@@ -98,7 +98,7 @@ class select implements i_expression {
      * @param string|null $alias Alias for the column name
      */
     public function select_sum(string $name, ?string $alias = null): void {
-        $this->select[] = new column_aggregate(aggregation::SUM, $name, $alias);
+        $this->columns = [new column_aggregate(aggregation::SUM, $name, $alias)];
     }
 
     /**
@@ -120,11 +120,11 @@ class select implements i_expression {
             $select .= 'DISTINCT ';
         }
 
-        if (empty($this->select)) {
+        if (empty($this->columns)) {
             $this->select_all();
         }
 
-        $exportedcolumns = array_map(fn (i_expression $col) => $col->get_sql(), $this->select);
+        $exportedcolumns = array_map(fn (i_expression $col) => $col->get_sql(), $this->columns);
         $select .= implode(', ', $exportedcolumns);
 
         return $select;
@@ -138,8 +138,8 @@ class select implements i_expression {
     public function get_params(): array {
         $params = [];
 
-        foreach ($this->select as $col) {
-            $params =  $col->get_params();
+        foreach ($this->columns as $col) {
+            $params[] = $col->get_params();
         }
 
         return array_merge(...$params);

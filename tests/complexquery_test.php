@@ -84,7 +84,7 @@ final class complexquery_test extends advanced_testcase {
             ->where('ue.status', '=', 0)
             ->where('u.deleted', '=', 0)
             ->where('u.suspended', '=', 0)
-            ->time_between('ue.timestart', 'ue.timeend')
+            ->where_currently_active('ue.timestart', 'ue.timeend')
             ->order_asc("ue.userid")
             ->get();
 
