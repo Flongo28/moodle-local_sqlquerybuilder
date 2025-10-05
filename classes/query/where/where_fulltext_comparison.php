@@ -16,21 +16,35 @@
 
 namespace local_sqlquerybuilder\query\where;
 
-use local_sqlquerybuilder\query\expression;
-
 /**
- * Where expression
+ * Compares fulltext
  *
  * @package     local_sqlquerybuilder
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class where_expression implements expression {
-    public function get_params(): array {
-        return [];
+class where_fulltext extends where_expression {
+
+    public function __construct(
+        private string $column,
+        private string $value,
+        private bool $negate = false,
+    ) {}
+
+    public function get_sql(): string {
+        global $DB;
+        $sql = '';
+        
+        if ($this->negate) {
+            $sql = 'NOT ';
+        }
+
+        $sql .= $DB->sql_compare_text($this->column, strlen($this->value));
+        return $sql . ' = ?';
     }
 
-    public function __toString() {
-        return $this->get_sql();
+
+    public function get_params(): array {
+        return [$this->value];
     }
 }

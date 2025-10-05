@@ -26,11 +26,15 @@ namespace local_sqlquerybuilder\query;
 
 use core\clock;
 use core\di;
+use local_sqlquerybuilder\query\where\like_options;
+use local_sqlquerybuilder\query\where\where_column_comparison;
 use local_sqlquerybuilder\query\where\where_expression;
 use local_sqlquerybuilder\query\where\where_comparison;
 use local_sqlquerybuilder\query\where\or_where_group;
+use local_sqlquerybuilder\query\where\where_fulltext;
 use local_sqlquerybuilder\query\where\where_is_null;
 use local_sqlquerybuilder\query\where\where_in;
+use local_sqlquerybuilder\query\where\where_like;
 
 /**
  * Trait for handling WHERE conditions in SQL queries.
@@ -49,7 +53,11 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function where($column, $operator, $value, $negate = false) {
+    public function where(string $column, string $operator, mixed $value, bool $negate = false) {
+        if ($operator == 'like') {
+            $this->whereconditions[] = new where_like($column, $value, $negate);    
+        }
+
         $this->whereconditions[] = new where_comparison($column, $operator, $value, $negate);
     }
 
@@ -60,8 +68,8 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
      * @param mixed $othercolumn The column to compare against
      */
-    public function where_column($column, $operator, $othercolumn, $negate = false) {
-        $this->whereconditions[] = new where_comparison($column, $operator, $othercolumn, $negate);
+    public function where_column(string $column, $operator, $othercolumn, bool $negate = false) {
+        $this->whereconditions[] = new where_column_comparison($column, $operator, $othercolumn, $negate);
     }
 
     /**
@@ -71,9 +79,9 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function or_where($column, $operator, $value, $negate = false) {
-        $whereclause = new where_comparison($column, $operator, $value, $negate);
-        $this->add_or_statement($whereclause);
+    public function or_where(string $column, string $operator, $value, bool $negate = false) {
+        $this->where($column, $operator, $value, $negate);
+        $this->combine_last_two_by_or();
     }
 
     // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
@@ -85,7 +93,7 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function where_not($column, $operator, $value) {
+    public function where_not(string $column, string $operator, $value) {
         $this->where($column, $operator, $value, true);
     }
 
@@ -96,8 +104,24 @@ class wherepart implements expression {
      * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
      * @param mixed $value The value to compare against
      */
-    public function or_where_not($column, $operator, $value) {
-        $this->orwhere($column, $operator, $value, true);
+    public function or_where_not(string $column, string $operator, $value) {
+        $this->or_where($column, $operator, $value, true);
+    }
+
+    public function where_fulltext(string $column, string $value, bool $negate = false) {
+        $this->whereconditions[] = new where_fulltext($column, $value, $negate);
+    }
+
+    public function where_fulltext_not(string $column, string $value) {
+        $this->whereconditions[] = new where_fulltext($column, $value, true);
+    }
+
+    public function where_like(string $column, string $value, like_options $options = null, bool $negate = false) {
+        $this->whereconditions[] = new where_like($column, $value, $negate, $options);
+    }
+
+    public function where_not_like(string $column, string $value, like_options $options = null) {
+        $this->where_like($column, $value, $options, true);
     }
 
     /**
@@ -105,7 +129,7 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function where_null($column) {
+    public function where_null(string $column) {
         $this->whereconditions[] = new where_is_null($column);
     }
 
@@ -114,9 +138,9 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function or_where_null($column) {
-        $isnullstatement = new where_is_null($column);
-        $this->add_or_statement($isnullstatement);
+    public function or_where_null(string $column) {
+        $this->where_null($column);
+        $this->combine_last_two_by_or();
     }
 
     /**
@@ -124,7 +148,7 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function where_notnull($column) {
+    public function where_notnull(string $column) {
         $this->whereconditions[] = new where_is_null($column, true);
     }
 
@@ -133,31 +157,39 @@ class wherepart implements expression {
      *
      * @param string $column The column name
      */
-    public function or_where_notnull($column) {
-        $notnullstatement = new where_is_null($column, true);
-        $this->add_or_statement($notnullstatement);
+    public function or_where_notnull(string $column) {
+        $this->where_notnull($column);
+        $this->combine_last_two_by_or();
     }
 
-    public function where_in(string $column, array $values) {
-        $this->whereconditions[] = new where_in($column, $values);
+    public function where_in(string $column, array $values, bool $negate = false) {
+        $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
     public function where_not_in(string $column, array $values) {
-        $this->whereconditions[] = new where_in($column, $values, true);
+        $this->where_in($column, $values, true);
     }
 
-    private function add_or_statement(where_expression $expression): void {
-        $endindex = count($this->whereconditions) -1;
-        $lastclause = $this->whereconditions[$endindex];
+    private function combine_last_two_by_or(): void {
+        if (count($this->whereconditions) < 2) {
+            return;
+        }
 
-        if ($lastclause instanceof or_where_group) {
-            $lastclause->add_clauses($expression);
+        $aclause = array_pop($this->whereconditions);
+        $bclause = array_pop($this->whereconditions);
+        $orclause = null;
+
+        if ($aclause instanceof or_where_group) {
+            $aclause->add_clauses($bclause);
+            $orclause = $aclause;
         } else {
-            $this->whereconditions[$endindex] = new or_where_group(
-                $lastclause,
-                $expression,
+            $orclause = new or_where_group(
+                $aclause,
+                $bclause,
             );
         }
+
+        $this->whereconditions[] = $orclause;
     }
 
     /**
@@ -175,9 +207,9 @@ class wherepart implements expression {
         }
 
         $this->where($columntimestart, '=', 0);
-        $this->orwhere($columntimestart, '<=', $timebetween);
+        $this->or_where($columntimestart, '<=', $timebetween);
         $this->where($columntimeend, '=', 0);
-        $this->orwhere($columntimeend, '>=', $timebetween);
+        $this->or_where($columntimeend, '>=', $timebetween);
     }
 
     /**

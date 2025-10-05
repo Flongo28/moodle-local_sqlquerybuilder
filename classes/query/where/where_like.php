@@ -16,46 +16,49 @@
 
 namespace local_sqlquerybuilder\query\where;
 
-use InvalidArgumentException;
-
 /**
- * Compares a column with a value
- * 
- * Do not use for TEXT only for VARCHAR!!!
+ * Compares a column with a string
  *
  * @package     local_sqlquerybuilder
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class where_column_comparison extends where_expression {
-    private string $operator;
+class where_like extends where_expression {
+    private like_options $options;
 
     public function __construct(
         private string $column,
-        string $operator,
-        private string $othercolumn,
+        private string $value,
         private bool $negate = false,
+        ?like_options $options = null,
     ) {
-        if ($operator == "!=") {
-            $operator = "<>";
+        if (is_null($options)) {
+            $options = new like_options();
         }
 
-        $validoperators = ["<>", "<", "<=", ">", ">=", "="];
-        if (!in_array($operator, $validoperators)) {
-            throw new InvalidArgumentException("Operator $operator is not supported by moodle");
-        }
-
-        $this->operator = $operator;
+        $this->options = $options;
     }
 
     public function get_sql(): string {
-        $sql = "";
+        global $DB;
 
-        if ($this->negate) {
-            $sql .= 'NOT ';
+        return $DB->sql_like(
+            $this->column,
+            '?',
+            $this->options->casesensitive,
+            $this->options->accentsensitive,
+            $this->negate,
+            $this->options->escapestring,
+        );        
+    }
+
+
+    public function get_params(): array {
+        if ($this->options->escape) {
+            global $DB;
+            return [$DB->sql_like_escape($this->value, $this->options->escapestring)];
         }
 
-        $sql .= "$this->column $this->operator $this->othercolumn";
-        return $sql;
+        return [$this->value];
     }
 }

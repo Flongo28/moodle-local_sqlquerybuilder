@@ -20,7 +20,6 @@ use BadMethodCallException;
 use dml_exception;
 use local_sqlquerybuilder\query\froms\from_expression;
 use stdClass;
-use moodle_database;
 
 /**
  * A Query builder

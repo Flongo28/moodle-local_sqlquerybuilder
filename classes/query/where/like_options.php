@@ -23,12 +23,9 @@ namespace local_sqlquerybuilder\query\where;
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class equal_options {
-    private bool $casesensitive = false;
-    private bool $accentsensitive = false;
-    private bool $escape = false;
-    private string $escapestring = ' \\ ';
-
-    /** @var bool If the field is a text not a char then use this option */
-    private bool $istext = false;
+class like_options {
+    public bool $casesensitive = false;
+    public bool $accentsensitive = false;
+    public bool $escape = false;
+    public string $escapestring = '\\';
 }
