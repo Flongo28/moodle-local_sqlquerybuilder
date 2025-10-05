@@ -16,6 +16,8 @@
 
 namespace local_sqlquerybuilder\query\where;
 
+use local_sqlquerybuilder\query\query;
+
 /**
  * Checks if the value is in the array
  *
@@ -25,23 +27,28 @@ namespace local_sqlquerybuilder\query\where;
  */
 class where_in extends where_expression {
     private string $insql;
-    private array $params;
+    private array|query $params;
 
 
     public function __construct(
         private string $column,
-        array $values,
+        array|query $values,
         bool $negate = false,
     ) {
         global $DB;
         
-        $inorequal = $DB->get_in_or_equal(
-            $values,
-            equal: !$negate,
-            onemptyitems: true,
-        );
-        $this->insql = $inorequal[0];
-        $this->params = $inorequal[1];
+        if (is_array($values)) {
+            $inorequal = $DB->get_in_or_equal(
+                $values,
+                equal: !$negate,
+                onemptyitems: true,
+            );
+            $this->insql = $inorequal[0];
+            $this->params = $inorequal[1];
+        } else {
+            $this->insql = "IN ($values)";
+            $this->params = $values->get_params();
+        }
     }
 
     public function get_sql(): string {

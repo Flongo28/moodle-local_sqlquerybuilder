@@ -162,11 +162,11 @@ class wherepart implements expression {
         $this->combine_last_two_by_or();
     }
 
-    public function where_in(string $column, array $values, bool $negate = false) {
+    public function where_in(string $column, array|query $values, bool $negate = false) {
         $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
-    public function where_not_in(string $column, array $values) {
+    public function where_not_in(string $column, array|query $values) {
         $this->where_in($column, $values, true);
     }
 

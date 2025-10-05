@@ -16,6 +16,9 @@
 
 namespace local_sqlquerybuilder\query\where;
 
+use InvalidArgumentException;
+use local_sqlquerybuilder\query\query;
+
 /**
  * Where expression
  *
@@ -23,7 +26,7 @@ namespace local_sqlquerybuilder\query\where;
  * @copyright   2025, Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class where_comparison extends where_column_comparison {
+class where_comparison extends where_expression {
     private string $operator;
 
     public function __construct(
@@ -32,10 +35,41 @@ class where_comparison extends where_column_comparison {
         private mixed $value,
         private bool $negate = false,
     ) {
-        parent::__construct($column, $operator, '?', $negate);
+        if ($operator == "!=") {
+            $operator = "<>";
+        }
+
+        $validoperators = ["<>", "<", "<=", ">", ">=", "="];
+        if (!in_array($operator, $validoperators)) {
+            throw new InvalidArgumentException("Operator $operator is not supported by moodle");
+        }
+
+        $this->operator = $operator;
+    }
+
+    public function get_sql(): string {
+        $sql = "";
+
+        if ($this->negate) {
+            $sql .= 'NOT ';
+        }
+
+        $sql .= "$this->column $this->operator ";
+
+        if ($this->value instanceof query) {
+            $sql .= "($this->value)";
+        } else {
+            $sql .= '?';
+        }
+
+        return $sql;
     }
 
     public function get_params(): array {
+        if ($this->value instanceof query) {
+            return $this->value->get_params();
+        }
+
         return [$this->value];
     }
 }

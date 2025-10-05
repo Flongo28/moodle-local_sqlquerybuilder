@@ -275,7 +275,7 @@ final class sqlgeneration_test extends advanced_testcase {
     }
 
     public function test_subquery_where_in_clause(): void {
-        $expected = "SELECT * FROM {unknown} WHERE field IN (SELECT id FROM {course} WHERE timestart > 1)";
+        $expected = "SELECT * FROM {unknown} WHERE field IN (SELECT id FROM {course} WHERE timestart > ?)";
         $expectedparams = [1];
 
         $latestcourses = db::table('course')
