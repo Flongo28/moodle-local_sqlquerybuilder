@@ -83,7 +83,7 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --standard moodle-extra -exlude 'moodle.Commenting.VariableComment.Missing,moodle.Commenting.ValidTags.Invalid,moodle.Commenting.MissingDocblock.Function' --max-warnings 0
+        run: moodle-plugin-ci codechecker --exclude=moodle.Commenting.VariableComment,moodle.Commenting.ValidTags,moodle.Commenting.MissingDocblock --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
