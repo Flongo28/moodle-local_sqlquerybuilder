@@ -31,13 +31,4 @@ interface i_db {
      * @return i_query
      */
     public function table(string|i_query $nameorquery, ?string $alias = null): i_query;
-
-    /**
-     * Creates a query on a custom made query
-     *
-     * @param mixed[][] $table Table with the structure of row[entry]
-     * @param string $tablename Name of the table, only used if aliases are given
-     * @param string[] $rowaliases List of aliases for the columns, it needs to have the same size as each entry
-     */
-    public function from_values(array $table, string $tablename, array $rowaliases): i_query;
 }

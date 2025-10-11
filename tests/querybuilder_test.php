@@ -112,19 +112,4 @@ final class querybuilder_test extends advanced_testcase {
 
         $this->assertEquals($this->users['muellerpaul'], $actual);
     }
-
-    public function test_from_values(): void {
-        $subquerya = $this->db->table('user', 'u')
-            ->where('u.firstname', '=', 'Paul')
-            ->select('u.firstname');
-
-        $subqueryb = $this->db->table('user', 'u')
-            ->where('u.firstname', '=', 'John')
-            ->select('u.firstname');
-
-        $actual = $this->db->from_values([[$subquerya, $subqueryb, "tryit"]], 'names', ['paul', 'john', 'tryit']);
-        $actual = $actual->first();
-
-        $this->assertEquals(['paul' => 'Paul', 'john' => 'John', 'tryit' => 'tryit'], (array)$actual);
-    }
 }
