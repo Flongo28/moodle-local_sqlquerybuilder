@@ -32,6 +32,7 @@ jobs:
         env:
           ACCEPT_EULA: 'Y'
           MSSQL_PID: 'Developer'
+          MSSQL_SA_PASSWORD: ''
         ports:
           - 1433:1433
         options: --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P YourPassword123 -Q 'SELECT 1'" --health-interval 10s --health-timeout 5s --health-retries 3
