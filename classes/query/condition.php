@@ -31,7 +31,7 @@ use local_sqlquerybuilder\query\where\where_in;
 use local_sqlquerybuilder\query\where\where_like;
 
 /**
- * Builds an where expression (Including WHERE itself).
+ * Builds an where expression without WHERE
  *
  * @package     local_sqlquerybuilder
  * @copyright   2025 Konrad Ebel <despair2400@proton.me>
