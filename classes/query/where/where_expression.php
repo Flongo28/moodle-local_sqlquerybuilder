@@ -30,7 +30,7 @@ abstract class where_expression implements i_expression {
         return [];
     }
 
-    public function __toString() {
+    public function __toString(): string {
         return $this->get_sql();
     }
 }

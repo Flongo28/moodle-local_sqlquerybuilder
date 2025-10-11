@@ -31,12 +31,12 @@ use stdClass;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class querybuilder_test extends advanced_testcase {
-
     private i_db $db;
     private array $users = [];
 
 
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
 
         $this->db = di::get(i_db::class);
@@ -48,13 +48,10 @@ final class querybuilder_test extends advanced_testcase {
 
 
     public function test_user_table_matches_moodle_db(): void {
-        global $DB;
-
         // Actual result using our query builder.
         $actual = $this->db->table('user')
-        ->get();
+            ->get();
 
-        // Compare
         $this->assertCount(4, $actual);
         foreach ($this->users as $user) {
             $this->assertEquals($user, $actual[$user->id]);
@@ -62,8 +59,6 @@ final class querybuilder_test extends advanced_testcase {
     }
 
     public function test_first_user_matches_moodle_db(): void {
-        global $DB;
-
         // Actual "first" record using query builder.
         $actual = $this->db->table('user')->offset(2)->first();
 
@@ -90,7 +85,6 @@ final class querybuilder_test extends advanced_testcase {
         // Actual result using query builder.
         $actual = $this->db->table('user')->where('firstname', '=', 'Paul')->get();
 
-        // Compare
         $paul = $this->users['muellerpaul'];
         $this->assertEquals([$paul->id => $paul], $actual);
     }
@@ -113,20 +107,5 @@ final class querybuilder_test extends advanced_testcase {
         $actual = $actual->first();
 
         $this->assertEquals($this->users['muellerpaul'], $actual);
-    }
-
-    public function test_from_values(): void {
-        $subquerya = $this->db->table('user', 'u')
-            ->where('u.firstname', '=', 'Paul')
-            ->select('u.firstname');
-
-        $subqueryb = $this->db->table('user', 'u')
-            ->where('u.firstname', '=', 'John')
-            ->select('u.firstname');
-
-        $actual = $this->db->from_values([[$subquerya, $subqueryb, "tryit"]], 'names', ['paul', 'john', 'tryit']);
-        $actual = $actual->first();
-
-        $this->assertEquals(['paul' => 'Paul', 'john' => 'John', 'tryit' => 'tryit'], (array)$actual);
     }
 }

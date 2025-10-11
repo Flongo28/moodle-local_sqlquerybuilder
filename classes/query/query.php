@@ -30,33 +30,24 @@ use local_sqlquerybuilder\query\froms\from_expression;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class query implements i_query {
-    private select $selectpart;
-    private join $joinpart;
+    private selectpart $selectpart;
+    private joinpart $joinpart;
     private wherepart $wherepart;
     private grouping $groupingpart;
     private orderby $orderbypart;
     private pagination $pagination;
 
-    /**
-     * Constructor
-     *
-     * @param from_expression $from table which concerns the query
-     */
     public function __construct(
         public from_expression $from
     ) {
-        $this->selectpart = new select();
-        $this->joinpart = new join();
+        $this->selectpart = new selectpart();
+        $this->joinpart = new joinpart();
         $this->wherepart = new wherepart();
         $this->groupingpart = new grouping();
         $this->orderbypart = new orderby();
         $this->pagination = new pagination();
     }
 
-    /**
-     * Compile the current builder state to a SQL query
-     * @return string the SQL query
-     */
     public function get_sql(): string {
         $sql = $this->selectpart->get_sql() . " "
             . "FROM " . $this->from->get_sql()
@@ -79,40 +70,22 @@ class query implements i_query {
         return array_merge(...$params);
     }
 
-    /**
-     * Get multiple entries from the query
-     *
-     * @return stdClass[] Entries from the database call
-     * @throws dml_exception Database is not reachable
-     */
     public function get(): array {
         global $DB;
         return $DB->get_records_sql($this->get_sql(), $this->get_params());
     }
 
-    /**
-     * Get the first entry from the query
-     *
-     * @return stdClass|false An entry if found one
-     * @throws dml_exception Database is not reachable
-     */
     public function first(): stdClass|false {
         global $DB;
-        $record = $DB->get_record_sql($this->get_sql(), $this->get_params(), strictness: IGNORE_MULTIPLE);
-        return $record;
+        $this->limit(1);
+        $record = $DB->get_records_sql($this->get_sql(), $this->get_params());
+        return reset($record) ?? false;
     }
 
-    /**
-     * Returns the entry searched id
-     *
-     * @param int $id Search ID
-     * @return stdClass|false An entry if found one
-     * @throws dml_exception Database is not reachable
-     */
     public function find(int $id): stdClass|false {
         $this->wherepart->where('id', '=', $id);
         return $this->first();
-    } 
+    }
 
     private function get_query_parts(): array {
         return [
@@ -139,11 +112,6 @@ class query implements i_query {
         throw new BadMethodCallException("Method $method is not defined");
     }
 
-    /**
-     * Returns the sql of this query
-     *
-     * @return string Converts the query to sql
-     */
     public function __toString(): string {
         return $this->get_sql();
     }

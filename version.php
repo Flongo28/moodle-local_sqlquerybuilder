@@ -27,5 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'local_sqlquerybuilder';
 $plugin->release = '1.0.0';
 $plugin->version = 2025100500;
-$plugin->requires = 2022112800; // Requires PHP 8.0.0 for union types
+// Requires PHP 8.0.0 for union types.
+$plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_STABLE;

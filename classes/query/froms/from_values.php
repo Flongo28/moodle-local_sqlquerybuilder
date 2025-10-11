@@ -26,25 +26,9 @@ use local_sqlquerybuilder\contracts\i_query;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class from_values implements from_expression {
-    /**
-     * Constructor
-     *
-     * @param string[][]|i_query[][] $table Table with the structure of row[entry] (Types can be mixed)
-     * @param string[]|null $rowaliases List of aliases for the columns, it needs to have the same size as each entry
-     * @param ?string $tablename Name of the table, only used if aliases are given
-     */
     public function __construct(
-        /**
-         * @var array|null table
-         */
         private array $table,
-        /**
-         * @var ?string table name
-         */
         private ?string $tablename = null,
-        /**
-         * @var array|null table asliases
-         */
         private ?array $rowaliases = null,
     ) {
     }
@@ -55,9 +39,9 @@ class from_values implements from_expression {
         foreach ($row as $value) {
             if ($value instanceof i_query) {
                 $formattedrow[] = "($value)";
-            } else if (is_string($value)) 
+            } else if (is_string($value)) {
                 $formattedrow[] = "'$value'";
-            else {
+            } else {
                 $formattedrow[] = $value;
             }
         }
@@ -65,12 +49,6 @@ class from_values implements from_expression {
         return "(" . implode(', ', $formattedrow) . ")";
     }
 
-    /**
-     * Exports as sql
-     *
-     * @param bool $rawsql Has no changes here
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         $from = "(VALUES ";
 
@@ -99,7 +77,7 @@ class from_values implements from_expression {
                 }
             }
         }
-        
+
         return array_merge(...$params);
     }
 }

@@ -24,26 +24,13 @@ namespace local_sqlquerybuilder\query\columns;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column_aggregate extends column {
-    /** @var aggregation Type of aggregation */
     private aggregation $type;
 
-    /**
-     * Constructor
-     *
-     * @param aggregation $type Aggregation type to use
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
-     */
     public function __construct(aggregation $type, string $name, ?string $alias = null) {
         $this->type = $type;
         parent::__construct($name, $alias);
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         $column = $this->type->value . "($this->name)";
 
@@ -52,14 +39,5 @@ class column_aggregate extends column {
         }
 
         return $column;
-    }
-
-    /**
-     * Should be the only column used
-     *
-     * @return bool True
-     */
-    public function standalone(): bool {
-        return true;
     }
 }

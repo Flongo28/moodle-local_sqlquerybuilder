@@ -24,44 +24,17 @@ namespace local_sqlquerybuilder\query\columns;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column_raw implements column_expression {
-
-    /**
-     * Constructor
-     *
-     * @param string $sql raw sql column
-     * @param mixed[] $params a list of params in the same order like the raw sql
-     * @param bool $onlycolumn true if this should be the only column selected
-     */
     public function __construct(
         private string $sql,
-        private array $params,
-        private bool $onlycolumn = false
-    ) {}
+        private array $params
+    ) {
+    }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         return $this->sql;
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_params(): array {
         return $this->params;
-    }
-
-    /**
-     * Whether this should be the only column used
-     *
-     * @return bool Specified by programmer
-     */
-    public function standalone(): bool {
-        return $this->onlycolumn;
     }
 }

@@ -18,15 +18,22 @@ namespace local_sqlquerybuilder\local;
 
 use core\hook\di_configuration;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\query\db;
+use local_sqlquerybuilder\query\database;
 
+/**
+ * Defines the dependencies for this plugin
+ *
+ * @copyright Konrad Ebel <despair2400@proton.me>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package local_sqlquerybuilder
+ */
 class dependency_declarations {
     public static function configure_dependencies(di_configuration $hook): void {
-        // Define i_db
+        // Define i_db.
         $hook->add_definition(
             id: i_db::class,
             definition: function (): i_db {
-                return new db();
+                return new database();
             }
         );
     }

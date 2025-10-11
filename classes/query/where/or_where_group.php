@@ -33,7 +33,7 @@ class or_where_group extends where_expression {
         $this->whereclauses = $whereclauses;
     }
 
-    public function add_clauses(where_expression ... $whereclauses): void {
+    public function add_clauses(where_expression ...$whereclauses): void {
         $this->whereclauses = array_merge($this->whereclauses, $whereclauses);
     }
 

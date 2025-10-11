@@ -24,7 +24,6 @@ namespace local_sqlquerybuilder\contracts;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface i_db {
-
     /**
      * Return a new query object for the given table.
      * @param string|i_query $nameorquery Name the table name or subquery
@@ -32,13 +31,4 @@ interface i_db {
      * @return i_query
      */
     public function table(string|i_query $nameorquery, ?string $alias = null): i_query;
-
-    /**
-     * Creates a query on a custom made query
-     *
-     * @param mixed[][] $table Table with the structure of row[entry]
-     * @param string $tablename Name of the table, only used if aliases are given
-     * @param string[] $rowaliases List of aliases for the columns, it needs to have the same size as each entry
-     */
-    public function from_values(array $table, string $tablename, array $rowaliases): i_query;
 }

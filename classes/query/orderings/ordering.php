@@ -26,12 +26,6 @@ use local_sqlquerybuilder\contracts\i_expression;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ordering implements i_expression {
-    /**
-     * Constructor
-     *
-     * @param string $column Expressions to order by
-     * @param bool $ascending Whether to filter ascending or descending
-     */
     public function __construct(
         private string $column,
         private bool $ascending,
@@ -39,11 +33,6 @@ class ordering implements i_expression {
     ) {
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string order by as sql
-     */
     public function get_sql(): string {
         if ($this->ascending) {
             return "$this->column ASC";
@@ -52,11 +41,6 @@ class ordering implements i_expression {
         }
     }
 
-    /**
-     * Returns the used params
-     *
-     * @return array Params used in the expression
-     */
     public function get_params(): array {
         return $this->params;
     }

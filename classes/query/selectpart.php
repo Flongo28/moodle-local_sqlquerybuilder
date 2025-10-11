@@ -30,89 +30,38 @@ use local_sqlquerybuilder\query\columns\column;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class select implements i_expression {
-    /** @var i_expression[] Selected columns */
+class selectpart implements i_expression {
     protected array $columns = [];
-
-    /** @var bool Whether to use DISTINCT OR ALL */
     protected bool $distinct = false;
 
-    /**
-     * Selects all columns
-     *
-     * Should not be used with other selects
-     */
     public function select_all(): void {
-        $this->columns = [new column_raw('*', [], true)];
+        $this->columns = [new column_raw('*', [])];
     }
 
-    /**
-     * Selects an array of columns
-     *
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
-     */
     public function select(string $name, ?string $alias = null): void {
         $this->columns[] = new column($name, $alias);
     }
 
-    /**
-     * Gives back the count of all entries
-     *
-     * Should not be used with other selects
-     */
     public function select_count(): void {
         $this->columns = [new column_aggregate(aggregation::COUNT, '1')];
     }
 
-    /**
-     * Gives back only the maximum of the defined parameter
-     *
-     * Should not be used with other selects
-     *
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
-     */
     public function select_max(string $name, ?string $alias = null): void {
         $this->columns = [new column_aggregate(aggregation::MAX, $name, $alias)];
     }
 
-    /**
-     * Gives back only the minimum of the defined parameter
-     *
-     * Should not be used with other selects
-     *
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
-     */
     public function select_min(string $name, ?string $alias = null): void {
         $this->columns = [new column_aggregate(aggregation::MIN, $name, $alias)];
     }
 
-    /**
-     * Gives back only the sum of the defined parameter
-     *
-     * Should not be used with other selects
-     *
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
-     */
     public function select_sum(string $name, ?string $alias = null): void {
         $this->columns = [new column_aggregate(aggregation::SUM, $name, $alias)];
     }
 
-    /**
-     * Only distinct columns are returned
-     */
     public function distinct(): void {
         $this->distinct = true;
     }
 
-    /**
-     * Builds the select part for a sql statement
-     *
-     * @return string sql select statement
-     */
     public function get_sql(): string {
         $select = 'SELECT ';
 
@@ -130,11 +79,6 @@ class select implements i_expression {
         return $select;
     }
 
-    /**
-     * Gives back all params of the select part
-     * 
-     * @return array All params used in select
-     */
     public function get_params(): array {
         $params = [];
 

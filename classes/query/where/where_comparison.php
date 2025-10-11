@@ -27,6 +27,7 @@ use local_sqlquerybuilder\contracts\i_query;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class where_comparison extends where_expression {
+    /** @var string $operator Operation to compare by */
     private string $operator;
 
     public function __construct(
