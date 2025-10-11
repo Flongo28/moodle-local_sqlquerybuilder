@@ -36,7 +36,7 @@ class where_in extends where_expression {
         bool $negate = false,
     ) {
         global $DB;
-        
+
         if (is_array($values)) {
             $inorequal = $DB->get_in_or_equal(
                 $values,

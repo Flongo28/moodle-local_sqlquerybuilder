@@ -34,6 +34,7 @@ final class complexquery_test extends advanced_testcase {
     private i_db $db;
 
     public function setUp(): void {
+        parent::setUp();
         $this->db = di::get(i_db::class);
     }
 
@@ -74,7 +75,6 @@ final class complexquery_test extends advanced_testcase {
         ];
         $expected = $DB->get_records_sql($sql, $params);
 
-
         // Actual result using query builder.
         $actual = $this->db->table('enrol', 'e')
             ->distinct()
@@ -90,5 +90,4 @@ final class complexquery_test extends advanced_testcase {
 
         $this->assertEquals($expected, $actual, 'QueryBuilder must return the same enrolled user IDs as raw SQL');
     }
-
 }

@@ -24,21 +24,12 @@ namespace local_sqlquerybuilder\query\columns;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column implements column_expression {
-    /**
-     * Constructor
-     */
     public function __construct(
-        /** @var string $name Name of the column */
         protected string $name,
-        /** @var string|null $alias Alias for the column name */
         protected ?string $alias = null
-    ) {}
+    ) {
+    }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         if ($this->alias === null) {
             return $this->name;
@@ -47,11 +38,6 @@ class column implements column_expression {
         return "($this->name) AS $this->alias";
     }
 
-    /**
-     * Exports the params used
-     *
-     * @return array No params needed
-     */
     public function get_params(): array {
         return [];
     }

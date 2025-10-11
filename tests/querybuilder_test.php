@@ -31,12 +31,12 @@ use stdClass;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class querybuilder_test extends advanced_testcase {
-
     private i_db $db;
     private array $users = [];
 
 
     public function setUp(): void {
+        parent::setUp();
         $this->resetAfterTest(true);
 
         $this->db = di::get(i_db::class);
@@ -52,9 +52,8 @@ final class querybuilder_test extends advanced_testcase {
 
         // Actual result using our query builder.
         $actual = $this->db->table('user')
-        ->get();
+            ->get();
 
-        // Compare
         $this->assertCount(4, $actual);
         foreach ($this->users as $user) {
             $this->assertEquals($user, $actual[$user->id]);
@@ -90,7 +89,6 @@ final class querybuilder_test extends advanced_testcase {
         // Actual result using query builder.
         $actual = $this->db->table('user')->where('firstname', '=', 'Paul')->get();
 
-        // Compare
         $paul = $this->users['muellerpaul'];
         $this->assertEquals([$paul->id => $paul], $actual);
     }

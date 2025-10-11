@@ -29,7 +29,7 @@ use local_sqlquerybuilder\query\joins\join_types;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class join implements i_expression {
+class joinpart implements i_expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 

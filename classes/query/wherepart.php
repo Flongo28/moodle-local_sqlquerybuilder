@@ -50,7 +50,7 @@ class wherepart implements i_expression {
      */
     public function where(string $column, string $operator, mixed $value, bool $negate = false): void {
         if ($operator == 'like') {
-            $this->whereconditions[] = new where_like($column, $value, $negate);    
+            $this->whereconditions[] = new where_like($column, $value, $negate);
         } else {
             $this->whereconditions[] = new where_comparison($column, $operator, $value, $negate);
         }

@@ -16,9 +16,10 @@
 
 /**
  * DI Hook
- * 
- * @author Konrad Ebel <despair2400@proton.me>
+ *
  * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package local_sqlquerybuilder
+ * @copyright Konrad Ebel <despair2400@proton.me>
  */
 
 use core\hook\di_configuration;

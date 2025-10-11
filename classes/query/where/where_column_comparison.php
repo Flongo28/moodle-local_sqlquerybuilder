@@ -20,7 +20,7 @@ use InvalidArgumentException;
 
 /**
  * Compares a column with a value
- * 
+ *
  * Do not use for TEXT only for VARCHAR!!!
  *
  * @package     local_sqlquerybuilder

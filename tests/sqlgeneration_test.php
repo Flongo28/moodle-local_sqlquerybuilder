@@ -34,6 +34,7 @@ final class sqlgeneration_test extends advanced_testcase {
 
 
     public function setUp(): void {
+        parent::setUp();
         $this->db = di::get(i_db::class);
     }
 
@@ -61,8 +62,13 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT * FROM (VALUES ((SELECT * FROM {users} WHERE id = ?), (SELECT * FROM {entries} WHERE id = ?), \'Tryit\')) AS custom(a,b,tryit)';
-        $expectedparams = [1, 2]; 
+        $expected = 'SELECT *
+                     FROM (VALUES(
+                        (SELECT * FROM {users} WHERE id = ?),
+                        (SELECT * FROM {entries} WHERE id = ?),
+                        \'Tryit\'))
+                    AS custom(a,b,tryit)';
+        $expectedparams = [1, 2];
 
         $subquerya = $this->db->table('users')
             ->where('id', '=', 1);

@@ -31,7 +31,7 @@ use local_sqlquerybuilder\query\froms\from_expression;
  */
 class query implements i_query {
     private selectpart $selectpart;
-    private join $joinpart;
+    private joinpart $joinpart;
     private wherepart $wherepart;
     private grouping $groupingpart;
     private orderby $orderbypart;
@@ -46,7 +46,7 @@ class query implements i_query {
         public from_expression $from
     ) {
         $this->selectpart = new selectpart();
-        $this->joinpart = new join();
+        $this->joinpart = new joinpart();
         $this->wherepart = new wherepart();
         $this->groupingpart = new grouping();
         $this->orderbypart = new orderby();
@@ -112,7 +112,7 @@ class query implements i_query {
     public function find(int $id): stdClass|false {
         $this->wherepart->where('id', '=', $id);
         return $this->first();
-    } 
+    }
 
     private function get_query_parts(): array {
         return [

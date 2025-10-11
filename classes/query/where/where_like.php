@@ -49,7 +49,7 @@ class where_like extends where_expression {
             $this->options->accentsensitive,
             $this->negate,
             $this->options->escapestring,
-        );        
+        );
     }
 
 

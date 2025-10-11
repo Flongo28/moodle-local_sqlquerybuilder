@@ -26,29 +26,12 @@ namespace local_sqlquerybuilder\query\froms;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class from_table implements from_expression {
-    /**
-     * Constructor
-     *
-     * @param string $table Table name
-     * @param string|null $alias Alias for the tablename
-     */
     public function __construct(
-        /**
-         * @var string|null table name
-         */
         private string $table,
-        /**
-         * @var string|null table alias
-         */
         private ?string $alias,
     ) {
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         if (is_null(value: $this->alias)) {
             return "{" . $this->table . "} ";
@@ -57,12 +40,6 @@ class from_table implements from_expression {
         return "{" . $this->table . "} " . $this->alias . " ";
     }
 
-    /**
-     * No params needed
-     *
-     *
-     * @return array No params needed
-     */
     public function get_params(): array {
         return [];
     }

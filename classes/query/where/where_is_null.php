@@ -24,7 +24,6 @@ namespace local_sqlquerybuilder\query\where;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class where_is_null extends where_expression {
-
     public function __construct(
         private string $column,
         private bool $negate = false,

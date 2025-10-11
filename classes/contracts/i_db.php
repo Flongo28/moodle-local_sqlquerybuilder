@@ -24,7 +24,6 @@ namespace local_sqlquerybuilder\contracts;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface i_db {
-
     /**
      * Return a new query object for the given table.
      * @param string|i_query $nameorquery Name the table name or subquery

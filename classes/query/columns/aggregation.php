@@ -24,18 +24,9 @@ namespace local_sqlquerybuilder\query\columns;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 enum aggregation: string {
-    // Maximum value.
     case MAX = 'MAX';
-
-    // Minimum value.
     case MIN = 'MIN';
-
-    // Average value.
     case AVG = 'AVG';
-
-    // Sum of values.
     case SUM = 'SUM';
-
-    // Count of values.
     case COUNT = 'COUNT';
 }
