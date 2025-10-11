@@ -20,8 +20,8 @@ namespace local_sqlquerybuilder\query\columns;
  * Basic column with alias for select statements
  *
  * @package local_sqlquerybuilder
- * @copyright   Konrad Ebel
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright Konrad Ebel
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column implements column_expression {
     public function __construct(

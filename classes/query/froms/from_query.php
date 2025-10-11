@@ -26,24 +26,12 @@ use local_sqlquerybuilder\contracts\i_query;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class from_query implements from_expression {
-    /**
-     * Constructor
-     *
-     * @param i_query $sourcequery Query that builds a table
-     * @param string $alias Alias for the table builded by the query (alias is needed!)
-     */
     public function __construct(
         private i_query $sourcequery,
         private string $alias,
     ) {
     }
 
-    /**
-     * Exports as sql
-     *
-     * @param bool $rawsql Has no changes here
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         $from = "($this->sourcequery) AS $this->alias";
         return $from;

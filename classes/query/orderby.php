@@ -28,19 +28,8 @@ use local_sqlquerybuilder\query\orderings\ordering;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class orderby implements i_expression {
-    /**
-     * @var array of orderings
-     */
     protected $orderings = [];
 
-    /**
-     * Orders the query by the columns (ascending order)
-     *
-     * The first sort order
-     *
-     * @param string ...$columns
-     * @return static Itself
-     */
     public function order_asc(string ...$columns): static {
         foreach ($columns as $column) {
             $this->orderings[] = new ordering(
@@ -52,14 +41,6 @@ class orderby implements i_expression {
         return $this;
     }
 
-    /**
-     * Orders the query by the columns (descending order)
-     *
-     * The first sort order
-     *
-     * @param string ...$columns
-     * @return static Itself
-     */
     public function order_desc(string ...$columns): static {
         foreach ($columns as $column) {
             $this->orderings[] = new ordering(
@@ -71,23 +52,11 @@ class orderby implements i_expression {
         return $this;
     }
 
-    /**
-     * Deletes all orders
-     *
-     * @return static Itself
-     */
     public function clear_order(): static {
         $this->orderings = [];
         return $this;
     }
 
-    /**
-     * Exports the “order by” part as sql
-     *
-     * Is an empty string if no columns are set
-     *
-     * @return string
-     */
     public function get_sql(): string {
         if (empty($this->orderings)) {
             return '';
@@ -98,11 +67,6 @@ class orderby implements i_expression {
         return "ORDER BY " . implode(', ', $formattedorderings);
     }
 
-    /**
-     * Exports all used params
-     *
-     * @return array Parameters of the expression
-     */
     public function get_params(): array {
         $params = array_map(fn (ordering $order) => $order->get_params(), $this->orderings);
         return array_merge(...$params);

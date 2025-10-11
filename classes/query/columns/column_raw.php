@@ -24,31 +24,16 @@ namespace local_sqlquerybuilder\query\columns;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class column_raw implements column_expression {
-    /**
-     * Constructor
-     */
     public function __construct(
-        /** @var string $sql raw sql column */
         private string $sql,
-        /** @var mixed $params a list of params in the same order like the raw sql */
         private array $params
     ) {
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_sql(): string {
         return $this->sql;
     }
 
-    /**
-     * Exports as sql
-     *
-     * @return string column for select as sql
-     */
     public function get_params(): array {
         return $this->params;
     }

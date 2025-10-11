@@ -24,10 +24,5 @@ namespace local_sqlquerybuilder\query\joins;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface join_expression {
-    /**
-     * Exports as sql
-     *
-     * @return string join as sql
-     */
     public function export(): string;
 }

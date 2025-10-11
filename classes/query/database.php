@@ -31,12 +31,6 @@ use local_sqlquerybuilder\query\froms\from_values;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class database implements i_db {
-    /**
-     * Return a new query object for the given table.
-     * @param string $name Name the table name
-     * @param string|null $alias Alias for the tablename
-     * @return i_query
-     */
     public function table(string|i_query $nameorquery, ?string $alias = null): i_query {
         if (is_string($nameorquery)) {
             return new query(new from_table($nameorquery, $alias));
@@ -45,13 +39,6 @@ class database implements i_db {
         return new query(new from_query($nameorquery, $alias));
     }
 
-    /**
-     * Creates a query on a custom made query
-     *
-     * @param Stringable[][] $table Table with the structure of row[entry]
-     * @param string $tablename Name of the table, only used if aliases are given
-     * @param string[] $rowaliases List of aliases for the columns, it needs to have the same size as each entry
-     */
     public function from_values(
         array $table,
         string $tablename,

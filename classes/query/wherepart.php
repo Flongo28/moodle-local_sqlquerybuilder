@@ -34,20 +34,12 @@ use local_sqlquerybuilder\query\where\where_like;
  * Builds an where expression (Including WHERE itself).
  *
  * @package     local_sqlquerybuilder
- * @copyright   2025 Your Name <you@example.com>
+ * @copyright   2025 Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class wherepart implements i_expression {
-    /** @var where_expression[] All where expressions */
     protected array $whereconditions = [];
 
-    /**
-     * Add a WHERE condition with AND logic.
-     *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
-     * @param mixed $value The value to compare against
-     */
     public function where(string $column, string $operator, mixed $value, bool $negate = false): void {
         if ($operator == 'like') {
             $this->whereconditions[] = new where_like($column, $value, $negate);
@@ -56,136 +48,65 @@ class wherepart implements i_expression {
         }
     }
 
-    /**
-     * Add a WHERE condition with AND logic.
-     *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, etc.)
-     * @param mixed $othercolumn The column to compare against
-     */
     public function where_column(string $column, string $operator, string $othercolumn, bool $negate = false): void {
         $this->whereconditions[] = new where_column_comparison($column, $operator, $othercolumn, $negate);
     }
 
-    /**
-     * Add a WHERE condition with OR logic.
-     *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
-     * @param mixed $value The value to compare against
-     */
     public function or_where(string $column, string $operator, mixed $value, bool $negate = false): void {
         $this->where($column, $operator, $value, $negate);
         $this->combine_last_two_by_or();
     }
 
-    // Todo column koennte auch ein Array sein -> where([['status', '=', '1'],['subscribed', '<>', '1'] ,
-    // dann gibt es keinen direkt operator/value.
-    /**
-     * Add a WHERE  not condition with AND logic.
-     *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
-     * @param mixed $value The value to compare against
-     */
     public function where_not(string $column, string $operator, mixed $value): void {
         $this->where($column, $operator, $value, true);
     }
 
-    /**
-     * Add a WHERE NOT condition with OR logic.
-     *
-     * @param string $column The column name
-     * @param string $operator The comparison operator (=, !=, >, <, >=, <=, LIKE, etc.)
-     * @param mixed $value The value to compare against
-     */
     public function or_where_not(string $column, string $operator, mixed $value): void {
         $this->or_where($column, $operator, $value, true);
     }
 
-    /**
-     * Compares fulltext to be equal
-     */
     public function where_fulltext(string $column, string $value, bool $negate = false): void {
         $this->whereconditions[] = new where_fulltext($column, $value, $negate);
     }
 
-    /**
-     * Compares fulltext to be not equal
-     */
     public function where_fulltext_not(string $column, string $value): void {
         $this->whereconditions[] = new where_fulltext($column, $value, true);
     }
 
-    /**
-     * Checks if a column is like
-     */
     public function where_like(string $column, string $value, ?like_options $options = null, bool $negate = false): void {
         $this->whereconditions[] = new where_like($column, $value, $negate, $options);
     }
 
-    /**
-     * Checks if a column is not like
-     */
     public function where_not_like(string $column, string $value, ?like_options $options = null): void {
         $this->where_like($column, $value, $options, true);
     }
 
-    /**
-     * Add a WHERE NULL condition with AND logic.
-     *
-     * @param string $column The column name
-     */
     public function where_null(string $column): void {
         $this->whereconditions[] = new where_is_null($column);
     }
 
-    /**
-     * Add a WHERE NULL condition with OR logic.
-     *
-     * @param string $column The column name
-     */
     public function or_where_null(string $column): void {
         $this->where_null($column);
         $this->combine_last_two_by_or();
     }
 
-    /**
-     * Add a WHERE NOT NULL condition with AND logic.
-     *
-     * @param string $column The column name
-     */
     public function where_notnull(string $column): void {
         $this->whereconditions[] = new where_is_null($column, true);
     }
 
-    /**
-     * Add a WHERE NOT NULL condition with OR logic.
-     *
-     * @param string $column The column name
-     */
     public function or_where_notnull(string $column): void {
         $this->where_notnull($column);
         $this->combine_last_two_by_or();
     }
 
-    /**
-     * Checks if the column is inside a list or query
-     */
     public function where_in(string $column, array|i_query $values, bool $negate = false): void {
         $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
-    /**
-     * Checks if the column is not inside a list or query
-     */
     public function where_not_in(string $column, array|i_query $values): void {
         $this->where_in($column, $values, true);
     }
 
-    /**
-     * Combines the last two condition with a where
-     */
     private function combine_last_two_by_or(): void {
         if (count($this->whereconditions) < 2) {
             return;
@@ -208,13 +129,6 @@ class wherepart implements i_expression {
         $this->whereconditions[] = $orclause;
     }
 
-    /**
-     * Checks if the given time is between the two columns
-     * If any of these columns are 0, they will not be checked
-     *
-     * @param string $columntimestart Column with start time
-     * @param string $columntimeend Column with end time
-     */
     public function where_currently_active(string $columntimestart, string $columntimeend): void {
         $currenttime = di::get(clock::class)->time();
 
@@ -224,11 +138,6 @@ class wherepart implements i_expression {
         $this->or_where($columntimeend, '>=', $currenttime);
     }
 
-    /**
-     * Export the WHERE clause as a SQL string.
-     *
-     * @return string The complete WHERE clause SQL string
-     */
     public function get_sql(): string {
         $whereclause = ' WHERE ';
         $firstiteration = true;
@@ -242,9 +151,6 @@ class wherepart implements i_expression {
         return $whereclause;
     }
 
-    /**
-     * Returns the used params in this expression
-     */
     public function get_params(): array {
         $params = array_map(fn (where_expression $expression) => $expression->get_params(), $this->whereconditions);
         return array_merge(...$params);

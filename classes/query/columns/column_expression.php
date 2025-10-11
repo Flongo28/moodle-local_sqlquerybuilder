@@ -26,10 +26,4 @@ use local_sqlquerybuilder\contracts\i_expression;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface column_expression extends i_expression {
-    /**
-     * Whether the column should be the only selected one
-     *
-     * @return bool if true, this column should be the only one
-     */
-    public function standalone(): bool;
 }

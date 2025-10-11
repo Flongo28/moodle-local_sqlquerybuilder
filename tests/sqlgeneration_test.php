@@ -62,12 +62,12 @@ final class sqlgeneration_test extends advanced_testcase {
      * @return void
      */
     public function test_custom_query_from(): void {
-        $expected = 'SELECT *
-                     FROM (VALUES(
-                        (SELECT * FROM {users} WHERE id = ?),
-                        (SELECT * FROM {entries} WHERE id = ?),
-                        \'Tryit\'))
-                    AS custom(a,b,tryit)';
+        $expected = 'SELECT * FROM (VALUES ' .
+                    '((SELECT * FROM {users} WHERE id = ?), ' .
+                    '(SELECT * FROM {entries} WHERE id = ?), ' .
+                    '\'Tryit\')) ' .
+                    'AS custom(a,b,tryit)';
+        $expected = str_replace("\n", '', $expected);
         $expectedparams = [1, 2];
 
         $subquerya = $this->db->table('users')

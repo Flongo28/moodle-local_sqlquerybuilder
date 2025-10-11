@@ -33,12 +33,6 @@ class joinpart implements i_expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 
-    /**
-     * Parse conditions array to support AND/OR logic
-     *
-     * @param mixed $conditions
-     * @return array Parsed conditions with logic operators
-     */
     private function parse_conditions($conditions) {
         // Handle single condition.
         if (!is_array($conditions) || (count($conditions) == 3 && !is_array($conditions[0]))) {
@@ -71,79 +65,26 @@ class joinpart implements i_expression {
         return $parsed;
     }
 
-    /**
-     * join - supports both single condition and array of conditions with AND/OR logic
-     *
-     * @param string|i_query $table
-     * @param mixed $conditions Single condition or array of conditions
-     *                         Format: [['first', 'op', 'second'], 'AND', ['first2', 'op2', 'second2'], 'OR', ...]
-     *                         OR: [['first', 'op', 'second']] (defaults to AND between multiple conditions)
-     * @param string $alias
-     * @return $this
-     */
     public function join(string|i_query $table, $conditions, string $alias = '') {
         $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::INNER, $alias];
-        return $this;
     }
 
-    /**
-     * left join - supports both single condition and array of conditions with AND/OR logic
-     *
-     * @param string|i_query $table
-     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
-     * @param string $alias
-     * @return $this
-     */
     public function left_join(string|i_query $table, $conditions, string $alias = '') {
         $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::LEFT, $alias];
-        return $this;
     }
 
-    /**
-     * right join - supports both single condition and array of conditions with AND/OR logic
-     *
-     * @param string|i_query $table
-     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
-     * @param string $alias
-     * @return $this
-     */
     public function right_join(string|i_query $table, $conditions, string $alias = '') {
         $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::RIGHT, $alias];
-        return $this;
     }
 
-    /**
-     * full join - supports both single condition and array of conditions with AND/OR logic
-     *
-     * @param string|i_query $table
-     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
-     * @param string $alias
-     * @return $this
-     */
     public function full_join(string $table, $conditions, string $alias = '') {
         $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::FULL, $alias];
-        return $this;
     }
 
-    // Todo: preliminary function - do not use.
-    /**
-     * cross join - supports both single condition and array of conditions with AND/OR logic
-     *
-     * @param string $table
-     * @param mixed $conditions Single condition or array of conditions with AND/OR logic
-     * @param string $alias
-     * @return $this
-     */
     public function crossjoin(string $table, $conditions, string $alias = '') {
         $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::CROSS, $alias];
-        return $this;
     }
 
-    /**
-     * export join string
-     *
-     * @return string
-     */
     public function get_sql(): string {
         if (empty($this->joins)) {
             return '';
