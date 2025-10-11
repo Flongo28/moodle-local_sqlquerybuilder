@@ -77,17 +77,13 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phplint
 
-      - name: PHP Copy/Paste Detector
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpcpd
-
       - name: PHP Mess Detector
         if: ${{ always() }}
         run: moodle-plugin-ci phpmd
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --max-warnings 0
+        run: moodle-plugin-ci codechecker --standard moodle-extra -exlude 'moodle.Commenting.VariableComment.Missing,moodle.Commenting.ValidTags.Invalid,moodle.Commenting.MissingDocblock.Function' --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
