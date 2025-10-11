@@ -38,7 +38,6 @@ use local_sqlquerybuilder\query\where\where_like;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class wherepart extends condition {
-
     public function get_sql(): string {
         if (empty($this->conditionparts)) {
             return '';

@@ -39,7 +39,7 @@ class dependency_declarations {
             }
         );
 
-        // Define i_condition
+        // Define i_condition.
         $hook->add_definition(
             id: i_condition::class,
             definition: function (): i_condition {
