@@ -27,35 +27,52 @@ use local_sqlquerybuilder\contracts\i_expression;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pagination implements i_expression {
+    /** @var ?int $limit Number of entries to fetch */
     private ?int $limit = null;
+    /** @var ?int $limit Number of entries to skip */
     private ?int $offset = null;
 
+    /**
+     * Sets the number of entries to fetch
+     */
     public function limit(int $limit): void {
         $this->limit = $limit;
     }
 
+    /**
+     * Sets the number of entries to skip
+     */
     public function offset(int $offset): void {
         $this->offset = $offset;
     }
 
+    /**
+     * Goes with pages through the entries
+     */
     public function page(int $pagecount, int $pagesize): void {
         $this->limit = $pagesize;
         $this->offset = $pagecount * $this->limit;
     }
 
+    /**
+     * Returns all used params
+     */
     public function get_params(): array {
         return [];
     }
 
+    /**
+     * Returns the sql orderby and limit part
+     */
     public function get_sql(): string {
         $pagination = "";
 
         if (!is_null($this->limit)) {
-            $pagination .= "LIMIT ". $this->limit;
+            $pagination .= "LIMIT " . $this->limit;
         }
 
         if (!is_null($this->offset)) {
-            $pagination .= "OFFSET ". $this->offset;
+            $pagination .= "OFFSET " . $this->offset;
         }
 
         return $pagination;

@@ -28,13 +28,13 @@ use local_sqlquerybuilder\contracts\i_expression;
 class ordering implements i_expression {
     /**
      * Constructor
-     *
-     * @param string $column Expressions to order by
-     * @param bool $ascending Whether to filter ascending or descending
      */
     public function __construct(
+        /** @var string $column Column to order by */
         private string $column,
+        /** @var string $ascending Direction to order */
         private bool $ascending,
+        /** @var array $params Params used in the expression */
         private array $params = []
     ) {
     }

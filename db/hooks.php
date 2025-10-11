@@ -14,8 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-use \core\hook\di_configuration;
-use \local_sqlquerybuilder\local\dependency_declarations;
+/**
+ * DI Hook
+ * 
+ * @author Konrad Ebel <despair2400@proton.me>
+ * @license https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+use core\hook\di_configuration;
+use local_sqlquerybuilder\local\dependency_declarations;
+
+defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [

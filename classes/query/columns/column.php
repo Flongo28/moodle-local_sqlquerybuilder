@@ -26,12 +26,11 @@ namespace local_sqlquerybuilder\query\columns;
 class column implements column_expression {
     /**
      * Constructor
-     *
-     * @param string $name Name of the column
-     * @param string|null $alias Alias for the column name
      */
     public function __construct(
+        /** @var string $name Name of the column */
         protected string $name,
+        /** @var string|null $alias Alias for the column name */
         protected ?string $alias = null
     ) {}
 
@@ -55,14 +54,5 @@ class column implements column_expression {
      */
     public function get_params(): array {
         return [];
-    }
-
-    /**
-     * Can be used with other columns
-     *
-     * @return bool False
-     */
-    public function standalone(): bool {
-        return false;
     }
 }

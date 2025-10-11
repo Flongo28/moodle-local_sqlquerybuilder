@@ -100,7 +100,7 @@ class orderby implements i_expression {
 
     /**
      * Exports all used params
-     * 
+     *
      * @return array Parameters of the expression
      */
     public function get_params(): array {

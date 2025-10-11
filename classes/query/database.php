@@ -30,8 +30,7 @@ use local_sqlquerybuilder\query\froms\from_values;
  * @copyright 2025 Daniel Meißner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class db implements i_db {
-
+class database implements i_db {
     /**
      * Return a new query object for the given table.
      * @param string $name Name the table name

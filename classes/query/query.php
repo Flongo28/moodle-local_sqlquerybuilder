@@ -30,7 +30,7 @@ use local_sqlquerybuilder\query\froms\from_expression;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class query implements i_query {
-    private select $selectpart;
+    private selectpart $selectpart;
     private join $joinpart;
     private wherepart $wherepart;
     private grouping $groupingpart;
@@ -45,7 +45,7 @@ class query implements i_query {
     public function __construct(
         public from_expression $from
     ) {
-        $this->selectpart = new select();
+        $this->selectpart = new selectpart();
         $this->joinpart = new join();
         $this->wherepart = new wherepart();
         $this->groupingpart = new grouping();

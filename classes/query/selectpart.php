@@ -30,7 +30,7 @@ use local_sqlquerybuilder\query\columns\column;
  * @copyright   Konrad Ebel
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class select implements i_expression {
+class selectpart implements i_expression {
     /** @var i_expression[] Selected columns */
     protected array $columns = [];
 
@@ -43,7 +43,7 @@ class select implements i_expression {
      * Should not be used with other selects
      */
     public function select_all(): void {
-        $this->columns = [new column_raw('*', [], true)];
+        $this->columns = [new column_raw('*', [])];
     }
 
     /**
@@ -132,7 +132,7 @@ class select implements i_expression {
 
     /**
      * Gives back all params of the select part
-     * 
+     *
      * @return array All params used in select
      */
     public function get_params(): array {

@@ -18,7 +18,7 @@ namespace local_sqlquerybuilder\local;
 
 use core\hook\di_configuration;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\query\db;
+use local_sqlquerybuilder\query\database;
 
 class dependency_declarations {
     public static function configure_dependencies(di_configuration $hook): void {
@@ -26,7 +26,7 @@ class dependency_declarations {
         $hook->add_definition(
             id: i_db::class,
             definition: function (): i_db {
-                return new db();
+                return new database();
             }
         );
     }

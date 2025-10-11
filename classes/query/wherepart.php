@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Where trait for SQL query building.
- *
- * @package     local_sqlquerybuilder
- * @copyright   2025 Your Name <you@example.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_sqlquerybuilder\query;
 
 use core\clock;
@@ -39,12 +31,13 @@ use local_sqlquerybuilder\query\where\where_in;
 use local_sqlquerybuilder\query\where\where_like;
 
 /**
- * Trait for handling WHERE conditions in SQL queries.
+ * Builds an where expression (Including WHERE itself).
  *
- * This trait provides methods for building WHERE clauses with AND and OR conditions.
+ * @package     local_sqlquerybuilder
+ * @copyright   2025 Your Name <you@example.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class wherepart implements i_expression {
-
     /** @var where_expression[] All where expressions */
     protected array $whereconditions = [];
 
@@ -110,19 +103,31 @@ class wherepart implements i_expression {
         $this->or_where($column, $operator, $value, true);
     }
 
+    /**
+     * Compares fulltext to be equal
+     */
     public function where_fulltext(string $column, string $value, bool $negate = false): void {
         $this->whereconditions[] = new where_fulltext($column, $value, $negate);
     }
 
+    /**
+     * Compares fulltext to be not equal
+     */
     public function where_fulltext_not(string $column, string $value): void {
         $this->whereconditions[] = new where_fulltext($column, $value, true);
     }
 
-    public function where_like(string $column, string $value, like_options $options = null, bool $negate = false): void {
+    /**
+     * Checks if a column is like
+     */
+    public function where_like(string $column, string $value, ?like_options $options = null, bool $negate = false): void {
         $this->whereconditions[] = new where_like($column, $value, $negate, $options);
     }
 
-    public function where_not_like(string $column, string $value, like_options $options = null): void {
+    /**
+     * Checks if a column is not like
+     */
+    public function where_not_like(string $column, string $value, ?like_options $options = null): void {
         $this->where_like($column, $value, $options, true);
     }
 
@@ -164,14 +169,23 @@ class wherepart implements i_expression {
         $this->combine_last_two_by_or();
     }
 
+    /**
+     * Checks if the column is inside a list or query
+     */
     public function where_in(string $column, array|i_query $values, bool $negate = false): void {
         $this->whereconditions[] = new where_in($column, $values, $negate);
     }
 
+    /**
+     * Checks if the column is not inside a list or query
+     */
     public function where_not_in(string $column, array|i_query $values): void {
         $this->where_in($column, $values, true);
     }
 
+    /**
+     * Combines the last two condition with a where
+     */
     private function combine_last_two_by_or(): void {
         if (count($this->whereconditions) < 2) {
             return;
@@ -228,6 +242,9 @@ class wherepart implements i_expression {
         return $whereclause;
     }
 
+    /**
+     * Returns the used params in this expression
+     */
     public function get_params(): array {
         $params = array_map(fn (where_expression $expression) => $expression->get_params(), $this->whereconditions);
         return array_merge(...$params);

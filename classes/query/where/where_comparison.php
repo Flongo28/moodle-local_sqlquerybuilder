@@ -27,12 +27,17 @@ use local_sqlquerybuilder\contracts\i_query;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class where_comparison extends where_expression {
+    /** @var string $operator Operation to compare by */
     private string $operator;
 
+    /** Constructor */
     public function __construct(
+        /** @var string $column Column to compare */
         private string $column,
         string $operator,
+        /** @var mixed $value Value or query to compare by */
         private mixed $value,
+        /** @var bool $negate Whether to negate comparison */
         private bool $negate = false,
     ) {
         if ($operator == "!=") {

@@ -24,13 +24,22 @@ namespace local_sqlquerybuilder\query\where;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class where_fulltext extends where_expression {
-
+    /**
+     * Constructor
+     */
     public function __construct(
+        /** @var string $column Column to filter */
         private string $column,
+        /** @var string $value String to check equality for */
         private string $value,
+        /** @var bool $negate Whether to check for non equal */
         private bool $negate = false,
-    ) {}
+    ) {
+    }
 
+    /**
+     * Gives out the sql
+     */
     public function get_sql(): string {
         global $DB;
         $sql = '';
@@ -44,6 +53,9 @@ class where_fulltext extends where_expression {
     }
 
 
+    /**
+     * Returns the parameters
+     */
     public function get_params(): array {
         return [$this->value];
     }
