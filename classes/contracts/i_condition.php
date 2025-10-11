@@ -37,7 +37,8 @@ interface i_condition extends i_expression {
     public function or_where_null(string $column): i_condition;
     public function where_notnull(string $column): i_condition;
     public function or_where_notnull(string $column): i_condition;
-    public function where_in(string $column, array|i_query $values, bool $negate = false): i_condition;
+    public function where_in(string $column, array|i_query $values): i_condition;
     public function where_not_in(string $column, array|i_query $values): i_condition;
     public function where_currently_active(string $columntimestart, string $columntimeend): i_condition;
+    public function has_no_conditions(): bool;
 }

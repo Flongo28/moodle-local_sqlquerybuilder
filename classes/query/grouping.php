@@ -16,7 +16,10 @@
 
 namespace local_sqlquerybuilder\query;
 
+use core\di;
 use local_sqlquerybuilder\contracts\i_expression;
+use local_sqlquerybuilder\contracts\i_condition_factory;
+use local_sqlquerybuilder\contracts\i_condition;
 
 /**
  * Grouping trait
@@ -27,54 +30,43 @@ use local_sqlquerybuilder\contracts\i_expression;
  */
 class grouping implements i_expression {
     protected array $groupby = [];
-    protected array $having = [];
+    protected i_condition $having;
+
+    public function __construct() {
+        $this->having = di::get(i_condition_factory::class)->create();
+    }
 
     public function group_by(string ...$column): void {
         $this->groupby = $column;
     }
 
     public function having(string $column, string $operator, mixed $value): void {
-        $this->having[] = [
-            'type' => 'AND',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => $value,
-        ];
+        $this->having->where($column, $operator, $value);
     }
 
     public function or_having(string $column, string $operator, mixed $value): void {
-        $this->having[] = [
-            'type' => 'OR',
-            'column' => $column,
-            'operator' => $operator,
-            'value' => $value,
-        ];
+        $this->having->or_where($column, $operator, $value);
     }
 
     public function get_sql(): string {
         if (empty($this->groupby)) {
             return '';
         }
+
         $groupbyclause = 'GROUP BY ' . implode(', ', $this->groupby);
-        if (empty($this->having)) {
+        if ($this->having->has_no_conditions()) {
             return $groupbyclause;
         }
-        $firstiteration = true;
-        foreach ($this->having as $having) {
-            if ($firstiteration) {
-                $groupbyclause .= ' HAVING ' . $having['column'] . ' ' . $having['operator'] .
-                    ' ' . $having['value'] . ' ';
-                $firstiteration = false;
-            } else {
-                $groupbyclause .= $having['type'] . ' ' . $having['column'] . ' ' . $having['operator'] .
-                    ' ' . $having['value'] . ' ';
-            }
-        }
 
-        return preg_replace('/\s{2,}/', ' ', $groupbyclause);
+        $groupbyclause .= ' HAVING ';
+        $groupbyclause .= $this->having->get_sql();
+        return $groupbyclause;
     }
 
     public function get_params(): array {
-        return [];
+        if (empty($this->groupby)) {
+            return [];
+        }
+        return $this->having->get_params();
     }
 }

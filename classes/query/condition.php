@@ -150,7 +150,7 @@ class condition implements i_condition {
     }
 
     public function get_sql(): string {
-        if (empty($this->conditionparts)) {
+        if ($this->has_no_conditions()) {
             return '';
         }
 
@@ -161,5 +161,9 @@ class condition implements i_condition {
     public function get_params(): array {
         $params = array_map(fn (where_expression $expression) => $expression->get_params(), $this->conditionparts);
         return array_merge(...$params);
+    }
+
+    public function has_no_conditions(): bool {
+        return empty($this->conditionparts);
     }
 }

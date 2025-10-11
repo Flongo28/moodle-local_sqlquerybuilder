@@ -19,7 +19,7 @@ namespace local_sqlquerybuilder\query;
 use core\di;
 use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\contracts\i_query;
-use local_sqlquerybuilder\contracts\i_condition;
+use local_sqlquerybuilder\contracts\i_condition_factory;
 use local_sqlquerybuilder\query\joins\join_expression;
 use local_sqlquerybuilder\query\joins\join_types;
 
@@ -37,7 +37,7 @@ class joinpart implements i_expression {
 
     private function parse_condition(array|callable $condition): condition {
         if (is_callable($condition)) {
-            $conditionbuilder = di::get(i_condition::class);
+            $conditionbuilder = di::get(i_condition_factory::class)->create();
             $condition($conditionbuilder);
             return $conditionbuilder;
         }

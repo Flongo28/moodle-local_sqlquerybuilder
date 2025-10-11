@@ -18,9 +18,9 @@ namespace local_sqlquerybuilder\local;
 
 use core\hook\di_configuration;
 use local_sqlquerybuilder\contracts\i_db;
-use local_sqlquerybuilder\contracts\i_condition;
+use local_sqlquerybuilder\contracts\i_condition_factory;
 use local_sqlquerybuilder\query\database;
-use local_sqlquerybuilder\query\condition;
+use local_sqlquerybuilder\query\condition_factory;
 
 /**
  * Defines the dependencies for this plugin
@@ -39,11 +39,11 @@ class dependency_declarations {
             }
         );
 
-        // Define i_condition.
+        // Define i_condition_factory.
         $hook->add_definition(
-            id: i_condition::class,
-            definition: function (): i_condition {
-                return new condition();
+            id: i_condition_factory::class,
+            definition: function (): i_condition_factory {
+                return new condition_factory();
             }
         );
     }
