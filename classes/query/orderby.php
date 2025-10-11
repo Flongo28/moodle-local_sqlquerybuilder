@@ -64,7 +64,7 @@ class orderby implements i_expression {
 
         $formattedorderings = array_map(fn (ordering $order) => $order->get_sql(), $this->orderings);
 
-        return "ORDER BY " . implode(', ', $formattedorderings);
+        return ' ORDER BY ' . implode(', ', $formattedorderings);
     }
 
     public function get_params(): array {

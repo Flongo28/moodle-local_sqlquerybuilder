@@ -16,8 +16,10 @@
 
 namespace local_sqlquerybuilder\query;
 
+use core\di;
 use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\contracts\i_query;
+use local_sqlquerybuilder\contracts\i_condition;
 use local_sqlquerybuilder\query\joins\join_expression;
 use local_sqlquerybuilder\query\joins\join_types;
 
@@ -33,56 +35,42 @@ class joinpart implements i_expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 
-    private function parse_conditions($conditions) {
+    private function parse_condition(array|callable $condition): condition {
+        if (is_callable($condition)) {
+            $conditionbuilder = di::get(i_condition::class);
+            $condition($conditionbuilder);
+            return $conditionbuilder;
+        }
+
+        $parsedcondition = new condition();
+
         // Handle single condition.
-        if (!is_array($conditions) || (count($conditions) == 3 && !is_array($conditions[0]))) {
-            return [['condition' => $conditions, 'logic' => null]];
+        if (count($condition) == 3) {
+            $parsedcondition->where_column($condition[0], $condition[1], $condition[2]);
+            return $parsedcondition;
         }
 
-        $parsed = [];
-        $currentlogic = null;
-
-        foreach ($conditions as $item) {
-            if (is_string($item) && (strtoupper($item) === 'AND' || strtoupper($item) === 'OR')) {
-                // This is a logic operator.
-                $currentlogic = strtoupper($item);
-            } else if (is_array($item) && count($item) >= 3) {
-                // This is a condition.
-                $parsed[] = ['condition' => $item, 'logic' => $currentlogic];
-                $currentlogic = 'AND'; // Default for next condition if not specified.
-            }
-        }
-
-        // If no parsed conditions, try the old format (array of arrays, all AND).
-        if (empty($parsed)) {
-            foreach ($conditions as $condition) {
-                if (is_array($condition) && count($condition) >= 3) {
-                    $parsed[] = ['condition' => $condition, 'logic' => count($parsed) === 0 ? null : 'AND'];
-                }
-            }
-        }
-
-        return $parsed;
+        throw new ValueError("Condition should have length of 3: " . var_export($condition, true));
     }
 
-    public function join(string|i_query $table, $conditions, string $alias = '') {
-        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::INNER, $alias];
+    public function join(string|i_query $table, array|callable $condition, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_condition($condition), join_types::INNER, $alias];
     }
 
-    public function left_join(string|i_query $table, $conditions, string $alias = '') {
-        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::LEFT, $alias];
+    public function left_join(string|i_query $table, array|callable $condition, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_condition($condition), join_types::LEFT, $alias];
     }
 
-    public function right_join(string|i_query $table, $conditions, string $alias = '') {
-        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::RIGHT, $alias];
+    public function right_join(string|i_query $table, array|callable $condition, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_condition($condition), join_types::RIGHT, $alias];
     }
 
-    public function full_join(string $table, $conditions, string $alias = '') {
-        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::FULL, $alias];
+    public function full_join(string $table, array|callable $condition, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_condition($condition), join_types::FULL, $alias];
     }
 
-    public function crossjoin(string $table, $conditions, string $alias = '') {
-        $this->joins[] = [$table, $this->parse_conditions($conditions), join_types::CROSS, $alias];
+    public function crossjoin(string $table, array|callable $condition, string $alias = '') {
+        $this->joins[] = [$table, $this->parse_condition($condition), join_types::CROSS, $alias];
     }
 
     public function get_sql(): string {
@@ -93,7 +81,7 @@ class joinpart implements i_expression {
 
         foreach ($this->joins as $join) {
             $table = $join[0];
-            $parsedconditions = $join[1];
+            $condition = $join[1];
             $jointype = $join[2];
             $alias = $join[3];
 
@@ -105,29 +93,20 @@ class joinpart implements i_expression {
             }
 
             // Build the conditions part with proper AND/OR logic.
-            $conditionparts = [];
-            foreach ($parsedconditions as $parsedcondition) {
-                $condition = $parsedcondition['condition'];
-                $logic = $parsedcondition['logic'];
-
-                if (is_array($condition) && count($condition) >= 3) {
-                    $conditionstr = $condition[0] . ' ' . $condition[1] . ' ' . $condition[2];
-
-                    if ($logic && !empty($conditionparts)) {
-                        $conditionparts[] = $logic . ' ' . $conditionstr;
-                    } else {
-                        $conditionparts[] = $conditionstr;
-                    }
-                }
-            }
-
-            $joinclause .= implode(' ', $conditionparts) . ' ';
+            $joinclause .= $condition->get_sql();
         }
 
-        return preg_replace('/\s{2,}/', ' ', trim($joinclause));
+        return $joinclause;
     }
 
     public function get_params(): array {
-        return [];
+        $params = [];
+
+        foreach ($this->joins as $join) {
+            $condition = $join[1];
+            $params[] = $condition->get_params();
+        }
+
+        return array_merge(...$params);
     }
 }

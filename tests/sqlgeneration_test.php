@@ -19,6 +19,7 @@ namespace local_sqlquerybuilder;
 use core\di;
 use advanced_testcase;
 use local_sqlquerybuilder\contracts\i_db;
+use local_sqlquerybuilder\contracts\i_condition;
 
 /**
  * Testing the SQL generation
@@ -296,6 +297,19 @@ final class sqlgeneration_test extends advanced_testcase {
 
         $actual = $this->db->table('unknown')
             ->where_in('field', $latestcourses);
+
+        $this->assertEquals($expected, $actual->get_sql());
+        $this->assertEquals($expectedparams, $actual->get_params());
+    }
+
+    public function test_subquery_join_where_in(): void {
+        $expected = "SELECT * FROM {unknown} JOIN {course} ON id IN (?,?,?)";
+        $expectedparams = [1, 2, 3];
+
+        $actual = $this->db->table('unknown')
+            ->join('course', function (i_condition $condition) {
+                $condition->where_in('id', [1, 2, 3]);
+            });
 
         $this->assertEquals($expected, $actual->get_sql());
         $this->assertEquals($expectedparams, $actual->get_params());
