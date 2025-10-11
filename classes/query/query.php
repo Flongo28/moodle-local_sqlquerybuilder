@@ -77,8 +77,9 @@ class query implements i_query {
 
     public function first(): stdClass|false {
         global $DB;
-        $record = $DB->get_record_sql($this->get_sql(), $this->get_params(), strictness: IGNORE_MULTIPLE);
-        return $record;
+        $this->limit(1);
+        $record = $DB->get_records_sql($this->get_sql(), $this->get_params());
+        return $record[0] ?? false;
     }
 
     public function find(int $id): stdClass|false {

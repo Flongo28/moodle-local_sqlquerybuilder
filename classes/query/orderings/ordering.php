@@ -27,11 +27,8 @@ use local_sqlquerybuilder\contracts\i_expression;
  */
 class ordering implements i_expression {
     public function __construct(
-        /** @var string $column Column to order by */
         private string $column,
-        /** @var string $ascending Direction to order */
         private bool $ascending,
-        /** @var array $params Params used in the expression */
         private array $params = []
     ) {
     }
