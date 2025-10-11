@@ -19,8 +19,8 @@ namespace local_sqlquerybuilder\query;
 use core\clock;
 use core\di;
 use local_sqlquerybuilder\contracts\i_query;
-use local_sqlquerybuilder\contracts\i_expression;
-use local_sqlquerybuilder\query\where\like_options;
+use local_sqlquerybuilder\contracts\i_condition;
+use local_sqlquerybuilder\contracts\like_options;
 use local_sqlquerybuilder\query\where\where_column_comparison;
 use local_sqlquerybuilder\query\where\where_expression;
 use local_sqlquerybuilder\query\where\where_comparison;
@@ -37,74 +37,84 @@ use local_sqlquerybuilder\query\where\where_like;
  * @copyright   2025 Konrad Ebel <despair2400@proton.me>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class condition implements i_expression {
+class condition implements i_condition {
     protected array $conditionparts = [];
 
-    public function where(string $column, string $operator, mixed $value, bool $negate = false): void {
+    public function where(string $column, string $operator, mixed $value, bool $negate = false): i_condition {
         if ($operator == 'like') {
             $this->conditionparts[] = new where_like($column, $value, $negate);
         } else {
             $this->conditionparts[] = new where_comparison($column, $operator, $value, $negate);
         }
+        return $this;
     }
 
-    public function where_column(string $column, string $operator, string $othercolumn, bool $negate = false): void {
+    public function where_column(string $column, string $operator, string $othercolumn, bool $negate = false): i_condition {
         $this->conditionparts[] = new where_column_comparison($column, $operator, $othercolumn, $negate);
+        return $this;
     }
 
-    public function or_where(string $column, string $operator, mixed $value, bool $negate = false): void {
+    public function or_where(string $column, string $operator, mixed $value, bool $negate = false): i_condition {
         $this->where($column, $operator, $value, $negate);
         $this->combine_last_two_by_or();
+        return $this;
     }
 
-    public function where_not(string $column, string $operator, mixed $value): void {
-        $this->where($column, $operator, $value, true);
+    public function where_not(string $column, string $operator, mixed $value): i_condition {
+        return $this->where($column, $operator, $value, true);
     }
 
-    public function or_where_not(string $column, string $operator, mixed $value): void {
-        $this->or_where($column, $operator, $value, true);
+    public function or_where_not(string $column, string $operator, mixed $value): i_condition {
+        return $this->or_where($column, $operator, $value, true);
     }
 
-    public function where_fulltext(string $column, string $value, bool $negate = false): void {
+    public function where_fulltext(string $column, string $value, bool $negate = false): i_condition {
         $this->conditionparts[] = new where_fulltext($column, $value, $negate);
+        return $this;
     }
 
-    public function where_fulltext_not(string $column, string $value): void {
-        $this->conditionparts[] = new where_fulltext($column, $value, true);
+    public function where_fulltext_not(string $column, string $value): i_condition {
+        return $this->where_fulltext($column, $value, true);
     }
 
-    public function where_like(string $column, string $value, ?like_options $options = null, bool $negate = false): void {
+    public function where_like(string $column, string $value, ?like_options $options = null, bool $negate = false): i_condition {
         $this->conditionparts[] = new where_like($column, $value, $negate, $options);
+        return $this;
     }
 
-    public function where_not_like(string $column, string $value, ?like_options $options = null): void {
-        $this->where_like($column, $value, $options, true);
+    public function where_not_like(string $column, string $value, ?like_options $options = null): i_condition {
+        return $this->where_like($column, $value, $options, true);
     }
 
-    public function where_null(string $column): void {
+    public function where_null(string $column): i_condition {
         $this->conditionparts[] = new where_is_null($column);
+        return $this;
     }
 
-    public function or_where_null(string $column): void {
+    public function or_where_null(string $column): i_condition {
         $this->where_null($column);
         $this->combine_last_two_by_or();
+        return $this;
     }
 
-    public function where_notnull(string $column): void {
+    public function where_notnull(string $column): i_condition {
         $this->conditionparts[] = new where_is_null($column, true);
+        return $this;
     }
 
-    public function or_where_notnull(string $column): void {
+    public function or_where_notnull(string $column): i_condition {
         $this->where_notnull($column);
         $this->combine_last_two_by_or();
+        return $this;
     }
 
-    public function where_in(string $column, array|i_query $values, bool $negate = false): void {
+    public function where_in(string $column, array|i_query $values, bool $negate = false): i_condition {
         $this->conditionparts[] = new where_in($column, $values, $negate);
+        return $this;
     }
 
-    public function where_not_in(string $column, array|i_query $values): void {
-        $this->where_in($column, $values, true);
+    public function where_not_in(string $column, array|i_query $values): i_condition {
+        return $this->where_in($column, $values, true);
     }
 
     private function combine_last_two_by_or(): void {
@@ -129,13 +139,14 @@ class condition implements i_expression {
         $this->conditionparts[] = $orclause;
     }
 
-    public function where_currently_active(string $columntimestart, string $columntimeend): void {
+    public function where_currently_active(string $columntimestart, string $columntimeend): i_condition {
         $currenttime = di::get(clock::class)->time();
 
         $this->where_null($columntimestart);
         $this->or_where($columntimestart, '<=', $currenttime);
         $this->where_null($columntimeend);
         $this->or_where($columntimeend, '>=', $currenttime);
+        return $this;
     }
 
     public function get_sql(): string {

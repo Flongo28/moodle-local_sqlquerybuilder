@@ -16,8 +16,10 @@
 
 namespace local_sqlquerybuilder\query;
 
+use core\di;
 use local_sqlquerybuilder\contracts\i_expression;
 use local_sqlquerybuilder\contracts\i_query;
+use local_sqlquerybuilder\contracts\i_condition;
 use local_sqlquerybuilder\query\joins\join_expression;
 use local_sqlquerybuilder\query\joins\join_types;
 
@@ -33,7 +35,13 @@ class joinpart implements i_expression {
     /** @var join_expression[] All join expressions for the request */
     protected array $joins = [];
 
-    private function parse_condition(array $condition): condition {
+    private function parse_condition(array|callable $condition): condition {
+        if (is_callable($condition)) {
+            $conditionbuilder = di::get(i_condition::class);
+            $condition($conditionbuilder);
+            return $conditionbuilder;
+        }
+
         $parsedcondition = new condition();
 
         // Handle single condition.
@@ -45,23 +53,23 @@ class joinpart implements i_expression {
         throw new ValueError("Condition should have length of 3: " . var_export($condition, true));
     }
 
-    public function join(string|i_query $table, array $condition, string $alias = '') {
+    public function join(string|i_query $table, array|callable $condition, string $alias = '') {
         $this->joins[] = [$table, $this->parse_condition($condition), join_types::INNER, $alias];
     }
 
-    public function left_join(string|i_query $table, array $condition, string $alias = '') {
+    public function left_join(string|i_query $table, array|callable $condition, string $alias = '') {
         $this->joins[] = [$table, $this->parse_condition($condition), join_types::LEFT, $alias];
     }
 
-    public function right_join(string|i_query $table, array $condition, string $alias = '') {
+    public function right_join(string|i_query $table, array|callable $condition, string $alias = '') {
         $this->joins[] = [$table, $this->parse_condition($condition), join_types::RIGHT, $alias];
     }
 
-    public function full_join(string $table, array $condition, string $alias = '') {
+    public function full_join(string $table, array|callable $condition, string $alias = '') {
         $this->joins[] = [$table, $this->parse_condition($condition), join_types::FULL, $alias];
     }
 
-    public function crossjoin(string $table, array $condition, string $alias = '') {
+    public function crossjoin(string $table, array|callable $condition, string $alias = '') {
         $this->joins[] = [$table, $this->parse_condition($condition), join_types::CROSS, $alias];
     }
 
@@ -88,10 +96,17 @@ class joinpart implements i_expression {
             $joinclause .= $condition->get_sql();
         }
 
-        return preg_replace('/\s{2,}/', ' ', trim($joinclause));
+        return $joinclause;
     }
 
     public function get_params(): array {
-        return [];
+        $params = [];
+
+        foreach ($this->joins as $join) {
+            $condition = $join[1];
+            $params[] = $condition->get_params();
+        }
+
+        return array_merge(...$params);
     }
 }
