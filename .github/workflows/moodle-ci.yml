@@ -36,14 +36,6 @@ jobs:
           - 1433:1433
         options: --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P YourPassword123 -Q 'SELECT 1'" --health-interval 10s --health-timeout 5s --health-retries 3
 
-      oracle:
-        image: oracle/database:19.3.0-ee
-        env:
-          ORACLE_ALLOW_EMPTY_PASSWORD: 'true'
-        ports:
-          - 1521:1521
-        options: --health-cmd="bash -c 'echo exit | sqlplus sys/YourPassword123@//localhost:1521/XE as sysdba'" --health-interval 10s --health-timeout 5s --health-retries 3
-
     strategy:
       fail-fast: false
       matrix:
@@ -57,9 +49,9 @@ jobs:
           - php: '8.3'
             moodle-branch: 'MOODLE_405_STABLE'
             database: 'sqlserver'
-          - php: '8.3'
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: 'oracle'
+          - php: '8.2'
+            moodle-branch: 'MOODLE_404_STABLE'
+            database: 'pgsql'
 
     steps:
       - name: Check out repository code
