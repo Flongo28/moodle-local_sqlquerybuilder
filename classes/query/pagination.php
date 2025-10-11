@@ -51,11 +51,11 @@ class pagination implements i_expression {
         $pagination = "";
 
         if (!is_null($this->limit)) {
-            $pagination .= "LIMIT " . $this->limit;
+            $pagination .= " LIMIT " . $this->limit;
         }
 
         if (!is_null($this->offset)) {
-            $pagination .= "OFFSET " . $this->offset;
+            $pagination .= " OFFSET " . $this->offset;
         }
 
         return $pagination;

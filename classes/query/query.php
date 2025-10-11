@@ -79,7 +79,7 @@ class query implements i_query {
         global $DB;
         $this->limit(1);
         $record = $DB->get_records_sql($this->get_sql(), $this->get_params());
-        return $record[0] ?? false;
+        return reset($record) ?? false;
     }
 
     public function find(int $id): stdClass|false {
