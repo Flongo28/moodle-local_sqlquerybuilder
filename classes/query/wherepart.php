@@ -140,7 +140,6 @@ class wherepart implements i_expression {
 
     public function get_sql(): string {
         $whereclause = ' WHERE ';
-        $firstiteration = true;
 
         if (empty($this->whereconditions)) {
             return '';

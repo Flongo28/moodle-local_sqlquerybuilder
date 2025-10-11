@@ -48,8 +48,6 @@ final class querybuilder_test extends advanced_testcase {
 
 
     public function test_user_table_matches_moodle_db(): void {
-        global $DB;
-
         // Actual result using our query builder.
         $actual = $this->db->table('user')
             ->get();
@@ -61,8 +59,6 @@ final class querybuilder_test extends advanced_testcase {
     }
 
     public function test_first_user_matches_moodle_db(): void {
-        global $DB;
-
         // Actual "first" record using query builder.
         $actual = $this->db->table('user')->offset(2)->first();
 
